@@ -50,7 +50,7 @@ Make your react style more easier
 - Example
 
 ```tsx
-    import { useStyleBuilder } from 'react-native-atomic-style';
+    import { useStyleBuilder } from '@tctien342/react-native-atomic-style';
     // On function component body
     const { s } = useStyleBuilder();
     // On render
