@@ -7,7 +7,7 @@
   "jsnext:main": "build/index.es.js",
   "scripts": {
     "build": "rollup -c",
-    "test": "jest --coverage",
+    "test": "jest --coverage --passWithNoTests",
     "lint": "eslint --cache --quiet --ext .js,.jsx,.ts,.tsx --fix .",
     "lint:staged": "lint-staged",
     "format": "prettier --write .",
