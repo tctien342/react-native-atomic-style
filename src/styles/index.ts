@@ -1,7 +1,7 @@
-import { SCREEN_TYPE } from '@constants/const';
+import { DEFAULT_BREAK_POINT } from '@constants/breakpoint';
 import { DARK_STYLE, LIGHT_STYLE } from '@constants/style';
 import { isOnlyDigit } from '@utils/regex';
-import { Platform, StyleProp } from 'react-native';
+import { StyleProp } from 'react-native';
 
 import { BorderBuilder } from './border';
 import { ColorBuilder } from './color';
@@ -42,31 +42,22 @@ const getStyle = (dark: boolean, prefix: string, commands: (string | number)[] =
   return false;
 };
 
-const breakpoint = {
-  i: () => Platform.OS === 'android',
-  a: () => Platform.OS === 'ios',
-  l: (dark: boolean) => dark,
-  d: (dark: boolean) => !dark,
-  pad: () => SCREEN_TYPE !== 'pad',
-  lg: () => SCREEN_TYPE !== 'lg',
-  sm: () => SCREEN_TYPE !== 'sm',
-};
-
 /**
  * Check if string builder have break point
  * @param commands array of builder string
  * @param args extras variable to passthrough
  */
-const checkBreakPoint = (commands: string[], ...args) => {
+const checkBreakPoint = (commands: string[], breakpoints = {}, ...args) => {
+  const bkps = { ...DEFAULT_BREAK_POINT, ...breakpoints };
   for (const token of commands) {
-    if (breakpoint[token]) {
-      return breakpoint[token](...args);
+    if (bkps[token]) {
+      return bkps[token](...args);
     }
   }
   return false;
 };
 
-export const s = (isDarkMode = false, override = {}) => {
+export const s = (isDarkMode = false, breakpoints = {}, overrideStyle = {}) => {
   const dark = isDarkMode ? 'dark' : 'light';
   /**
    * Convert tachyons syntax string to react native style
@@ -92,13 +83,13 @@ export const s = (isDarkMode = false, override = {}) => {
     for (const part of parts) {
       let out: false | { [key: string]: any } = false;
       let commands = part.split('-');
-      if (checkBreakPoint(commands, isDarkMode)) {
+      if (checkBreakPoint(commands, breakpoints, isDarkMode)) {
         continue;
       }
-      commands = commands.filter((val) => !['pad', 'sm', 'lg', 'a', 'i'].includes(val));
+      commands = commands.filter((val) => !Object.keys(breakpoints).includes(val));
       switch (commands.length) {
         case 1: {
-          out = getStyle(isDarkMode, part, undefined, override);
+          out = getStyle(isDarkMode, part, undefined, overrideStyle);
           break;
         }
         case 2: {
@@ -106,21 +97,23 @@ export const s = (isDarkMode = false, override = {}) => {
             isDarkMode,
             commands[0],
             [isOnlyDigit.test(commands[1]) || commands[1].includes('.') ? parseInt(commands[1], 10) : commands[1]],
-            override,
+            overrideStyle,
           );
           break;
         }
         case 3: {
-          const prefix = commands.shift()!;
-          if (commands[0]) {
-            out = getStyle(isDarkMode, prefix, commands, override);
-            break;
+          const prefix = commands.shift();
+          if (prefix) {
+            if (commands[0]) {
+              out = getStyle(isDarkMode, prefix, commands, overrideStyle);
+              break;
+            }
+            if (isOnlyDigit.test(commands[1]) || commands[1].includes('.')) {
+              out = getStyle(isDarkMode, prefix, [parseInt(commands[1], 10) * -1], overrideStyle);
+              break;
+            }
           }
-          if (isOnlyDigit.test(commands[1]) || commands[1].includes('.')) {
-            out = getStyle(isDarkMode, prefix, [parseInt(commands[1], 10) * -1], override);
-            break;
-          }
-          out = getStyle(isDarkMode, part, undefined, override);
+          out = getStyle(isDarkMode, part, undefined, overrideStyle);
         }
       }
       if (out) {

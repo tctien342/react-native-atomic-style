@@ -4,4 +4,4 @@ export declare const styleBuilders: (style: IAppStyles) => {
         [key: string]: any;
     };
 };
-export declare const s: (isDarkMode?: boolean, override?: {}) => (styleString: string) => StyleProp<{}>;
+export declare const s: (isDarkMode?: boolean, breakpoints?: {}, overrideStyle?: {}) => (styleString: string) => StyleProp<{}>;

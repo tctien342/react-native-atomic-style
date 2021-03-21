@@ -1,46 +1,23 @@
-export const selColor = (style: IAppStyles, select: string, defaultColor: string) => {
-  let out = defaultColor;
+export const selColor = (style: IAppStyles, select: string, defaultColor: string): string => {
+  let key = select.toUpperCase();
   switch (select) {
-    case 'white':
-      out = style.COLORS.WHITE;
-      break;
-    case 'prime':
-      out = style.COLORS.PRIME;
-      break;
-    case 'purble':
-      out = style.COLORS.PURPLE;
-      break;
-    case 'blue':
-      out = style.COLORS.BLUE;
-      break;
-    case 'orange':
-      out = style.COLORS.ORANGE;
-      break;
-    case 'red':
-      out = style.COLORS.RED;
-      break;
-    case 'green':
-      out = style.COLORS.GREEN;
-      break;
-    case 'black':
-      out = style.COLORS.BLACK;
-      break;
     case 'med':
-      out = style.COLORS.BACKGROUND_MED;
+      key = 'BACKGROUND_MED';
       break;
     case 'light':
-      out = style.COLORS.BACKGROUND_LIGHT;
+      key = 'BACKGROUND_LIGHT';
       break;
     case 'fhard':
-      out = style.COLORS.FONT_HARD;
+      key = 'FONT_HARD';
       break;
     case 'flight':
-      out = style.COLORS.FONT_LIGHT;
-      break;
-    default:
+      key = 'FONT_LIGHT';
       break;
   }
-  return out;
+  if (key in style.COLORS) {
+    return style.COLORS[key];
+  }
+  return defaultColor;
 };
 
 export const ColorBuilder: TStringBuilder = (style: IAppStyles) => ({

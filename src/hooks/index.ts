@@ -1,53 +1,68 @@
 import {
+  GLOBAL_BREAKPOINT_KEY,
   GLOBAL_DARK_STYLE_KEY,
   GLOBAL_DARKMODE_STATE,
   GLOBAL_LIGHT_STYLE_KEY,
   GLOBAL_STYLE_RULE_KEY,
-  INITIAL_STATES,
+  useGlobalState,
 } from '@constants/state';
-import { DARK_STYLE, LIGHT_STYLE } from '@constants/style';
 import { s } from '@styles/index';
 import { useEffect, useState } from 'react';
-import { createGlobalState } from 'react-hooks-global-state';
 import { StyleProp, TextStyle, ViewStyle } from 'react-native';
 
-const { useGlobalState } = createGlobalState(INITIAL_STATES);
+const useOverrideBuilder = () => {
+  const [crrRule, setRules] = useGlobalState(GLOBAL_STYLE_RULE_KEY);
+  const [crrLight, setLightStyle] = useGlobalState(GLOBAL_LIGHT_STYLE_KEY);
+  const [crrDark, setDarkStyle] = useGlobalState(GLOBAL_DARK_STYLE_KEY);
+  const [crrBreaks, setBreakPoint] = useGlobalState(GLOBAL_BREAKPOINT_KEY);
 
-/**
- * Override current app style
- * @param style New style for app
- * @param isLightStyle True for set light theme
- */
-const useOverrideStyle = (style: Partial<IAppStyles>, isLightStyle = true) => {
-  if (isLightStyle) {
-    const [, setStyle] = useGlobalState(GLOBAL_LIGHT_STYLE_KEY);
-    setStyle({ ...LIGHT_STYLE, ...style });
-  } else {
-    const [, setStyle] = useGlobalState(GLOBAL_DARK_STYLE_KEY);
-    setStyle({ ...DARK_STYLE, ...style });
-  }
-};
+  /**
+   * Define your custom build rules
+   * @param rules Your custom rules
+   * ## Example
+   * ```js
+   * { "wh": (arg1, arg2) => ({width: arg1, height: arg2}) }
+   * ```
+   * `wh-10-22` will be { width: 10, height: 22 }
+   * ```js
+   * { "pa--l1": () => ({ padding: $l1 }) }
+   * ```
+   * `pa--btn` will be { padding: $l1 }
+   */
+  const overrideRules = (newRule: { [key: string]: (...arg) => StyleProp<ViewStyle> | StyleProp<TextStyle> }) => {
+    setRules({ ...crrRule, ...newRule });
+  };
 
-/**
- * Define your custom build rules
- * @param rules Your custom rules
- * ## Example
- * ```js
- * { "wh": (arg1, arg2) => ({width: arg1, height: arg2}) }
- * ```
- * `wh-10-22` will be { width: 10, height: 22 }
- * ```js
- * { "pa--l1": () => ({ padding: $l1 }) }
- * ```
- * `pa--btn` will be { padding: $l1 }
- */
-const useOverrideRules = (
-  rules: {
-    [key: string]: <T>(...arg) => StyleProp<ViewStyle> | StyleProp<TextStyle>;
-  } = {},
-) => {
-  const [, setRules] = useGlobalState(GLOBAL_STYLE_RULE_KEY);
-  setRules(rules || []);
+  /**
+   * Override current app style
+   * @param style New style for app
+   * @param isLightStyle True for set light theme
+   */
+  const overrideStyle = (style: Partial<IAppStyles>, isLightStyle = true) => {
+    if (isLightStyle) {
+      setLightStyle({ ...crrLight, ...style });
+    } else {
+      setDarkStyle({ ...crrDark, ...style });
+    }
+  };
+
+  /**
+   * Add new breakpoint into builder
+   * ```js
+   * {
+   * i: () => Platform.OS !== 'ios'
+   * a: () => Platform.OS !== 'android'
+   * }
+   * ```
+   * => `w-10-i` will only in `ios`
+   * and `w-10-a` will only in `android`
+   * @param breakpoints New breakpoint to be declare
+   */
+  const overrideBreakpoint = (breakpoints: { [key: string]: (dark?: boolean) => boolean }) => {
+    setBreakPoint({ ...crrBreaks, ...breakpoints });
+  };
+
+  return { overrideRules, overrideStyle, overrideBreakpoint };
 };
 
 /**
@@ -106,7 +121,8 @@ const useStyleBuilder = (): {
   const [style] = useDynamicStyle();
   const { isDarkMode, setDarkMode } = useDarkMode();
   const [overrideRules] = useGlobalState(GLOBAL_STYLE_RULE_KEY);
-  return { s: s(isDarkMode, overrideRules), style, isDarkMode, setDarkMode };
+  const [breakpoints] = useGlobalState(GLOBAL_BREAKPOINT_KEY);
+  return { s: s(isDarkMode, breakpoints, overrideRules), style, isDarkMode, setDarkMode };
 };
 
-export { useDarkMode, useDynamicStyle, useOverrideRules, useOverrideStyle, useStyleBuilder };
+export { useDarkMode, useDynamicStyle, useOverrideBuilder, useStyleBuilder };

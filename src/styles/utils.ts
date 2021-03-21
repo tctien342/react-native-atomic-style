@@ -6,21 +6,22 @@ export const UtilsBuilder: TStringBuilder = (_style: IAppStyles) => ({
   relative: () => ({
     position: 'relative',
   }),
-  ci: () => ({
+  centerItems: () => ({
     justifyContent: 'center',
     alignItems: 'center',
   }),
-  jc: () => ({ justifyContent: 'center' }),
-  js: () => ({ justifyContent: 'flex-start' }),
-  je: () => ({ justifyContent: 'flex-end' }),
-  ic: () => ({ alignItems: 'center' }),
-  is: () => ({ alignItems: 'flex-start' }),
-  ie: () => ({ alignItems: 'flex-end' }),
+  justifyCenter: () => ({ justifyContent: 'center' }),
+  justifyStart: () => ({ justifyContent: 'flex-start' }),
+  justifyEnd: () => ({ justifyContent: 'flex-end' }),
+  itemsCenter: () => ({ alignItems: 'center' }),
+  itemsStart: () => ({ alignItems: 'flex-start' }),
+  itemsEnd: () => ({ alignItems: 'flex-end' }),
   flexWrap: () => ({ flexWrap: 'wrap' }),
-  row: () => ({
+  flexNoWrap: () => ({ flexWrap: 'nowrap' }),
+  flexRow: () => ({
     flexDirection: 'row',
   }),
-  col: () => ({
+  flexCol: () => ({
     flexDirection: 'column',
   }),
   shadow: (depth = 4, color = '#000') => ({
@@ -41,5 +42,7 @@ export const UtilsBuilder: TStringBuilder = (_style: IAppStyles) => ({
   scale: (value = 1) => ({
     transform: [{ scale: value }],
   }),
-  'of--hidden': () => ({ overflow: 'hidden' }),
+  ofVisible: () => ({ overflow: 'visible' }),
+  ofHidden: () => ({ overflow: 'hidden' }),
+  ofScroll: () => ({ overflow: 'scroll' }),
 });

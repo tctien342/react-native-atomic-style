@@ -1,11 +1,11 @@
-import { SCALE_BASE, SCREEN_HEIGHT, SCREEN_TYPE, SCREEN_WIDTH } from '@constants/const';
+import { SCALE_BASE, SCREEN_HEIGHT, SCREEN_TYPE, SCREEN_WIDTH } from '@constants/size';
 import { PixelRatio, Platform } from 'react-native';
 
 /**
  * Resize an size base on scale value
  * @param size Size that need to be normalize
  */
-const reScale = (size: number, scale = SCALE_BASE) => {
+const reScale = (size: number, scale = SCALE_BASE): number => {
   if (size === 1) return 1;
   let newSize = size * scale;
   switch (SCREEN_TYPE) {
@@ -27,14 +27,14 @@ const reScale = (size: number, scale = SCALE_BASE) => {
  * Return width base on phone screen
  * @param percent 0-100 percent of view width
  */
-const vw = (percent: number) => {
+const vw = (percent: number): number => {
   return Math.round((SCREEN_WIDTH * percent) / 100);
 };
 /**
  * Return height base on phone screen
  * @param percent 0-100 percent of view height
  */
-const vh = (percent: number) => {
+const vh = (percent: number): number => {
   return Math.round((SCREEN_HEIGHT * percent) / 100);
 };
 

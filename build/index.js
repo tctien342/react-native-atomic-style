@@ -38,10 +38,30 @@ function __spreadArray(to, from) {
 }
 
 var _a$1 = reactNative.Dimensions.get('window'), SCREEN_WIDTH = _a$1.width, SCREEN_HEIGHT = _a$1.height;
-var SCALE_BASE = SCREEN_WIDTH / 320; // based on iPhone 5s's scale
+var DEFAULT_SIZE_CONF = {
+    scaleBase: SCREEN_WIDTH / 320,
+    scaleSize: {
+        sm: 0.95,
+        lg: 1,
+        pad: 0.9,
+    },
+    scalePoint: {
+        x1: 1.8,
+        x2: 4 / 3,
+    },
+};
 var MIN_DIMENSION = Math.min(SCREEN_WIDTH, SCREEN_HEIGHT);
 var SCREEN_RATIO = SCREEN_HEIGHT / SCREEN_WIDTH;
-var SCREEN_TYPE = SCREEN_RATIO > 1.8 ? 'lg' : SCREEN_RATIO > 4 / 3 ? 'sm' : 'pad';
+var SCALE_BASE = DEFAULT_SIZE_CONF.scaleBase;
+var SCREEN_TYPE = SCREEN_RATIO > DEFAULT_SIZE_CONF.scalePoint.x1 ? 'lg' : SCREEN_RATIO > DEFAULT_SIZE_CONF.scalePoint.x2 ? 'sm' : 'pad';
+/**
+ * Change current scale config
+ */
+var setSizeConfig = function (config) {
+    DEFAULT_SIZE_CONF = __assign(__assign({}, DEFAULT_SIZE_CONF), config);
+};
+
+const s$1=(e,t)=>{if(!e.includes(t))throw new Error(`'${t}' not found. It must be provided in initialState as a property key.`)},c="production"!==process.env.NODE_ENV?Symbol("UPDATE_STATE"):Symbol(),a=(a,l)=>{const u=Object.keys(l);let i=l,d=null;const p={};u.forEach(e=>{p[e]=new Set;});const E=(e,t)=>t.type===c?t.r?t.r(e):t.e:a(e,t),f=(e,t)=>{"production"!==process.env.NODE_ENV&&s$1(u,e);const r=r=>{return {...r,[e]:(o=r[e],n=t,"function"==typeof n?n(o):n)};var o,n;};if(d)d({type:c,r});else {i=r(i);const t=i[e];p[e].forEach(e=>e(t));}},S=(e,t)=>{u.forEach(r=>{const o=t[r];e[r]!==o&&p[r].forEach(e=>e(o));});};return {useGlobalStateProvider:()=>{const[o,n]=react.useReducer(E,i);react.useEffect(()=>{if(d)throw new Error("Only one global state provider is allowed");return d=n,n({type:c,e:i}),()=>{d=null;}},[]);const s=react.useRef(o);S(s.current,o),s.current=o,react.useEffect(()=>{i=o;},[o]);},useGlobalState:e=>{"production"!==process.env.NODE_ENV&&s$1(u,e);const[r,c]=react.useState(i[e]);return react.useEffect(()=>(p[e].add(c),c(i[e]),()=>{p[e].delete(c);}),[e]),[r,react.useCallback(t=>f(e,t),[e])]},getGlobalState:e=>("production"!==process.env.NODE_ENV&&s$1(u,e),i[e]),setGlobalState:f,getState:()=>i,setState:e=>{if(d)d({type:c,e});else {const t=i;i=e,S(t,i);}},dispatch:e=>{if(d)d(e);else {const t=i;i=a(i,e),S(t,i);}return e}}},l=e=>a((e,t)=>e,e);
 
 /**
  * Resize an size base on scale value
@@ -129,12 +149,25 @@ var GLOBAL_LIGHT_STYLE_KEY = 'GLOBAL_LIGHT_STYLE_KEY';
 var GLOBAL_DARK_STYLE_KEY = 'GLOBAL_DARK_STYLE_KEY';
 var GLOBAL_STYLE_RULE_KEY = 'GLOBAL_STYLE_RULE_KEY';
 var GLOBAL_DARKMODE_STATE = 'GLOBAL_DARKMODE_STATE';
+var GLOBAL_BREAKPOINT_KEY = 'GLOBAL_BREAKPOINT_KEY';
 var INITIAL_STATES = (_a = {},
     _a[GLOBAL_LIGHT_STYLE_KEY] = LIGHT_STYLE,
     _a[GLOBAL_DARK_STYLE_KEY] = DARK_STYLE,
+    _a[GLOBAL_BREAKPOINT_KEY] = {},
     _a[GLOBAL_STYLE_RULE_KEY] = {},
     _a[GLOBAL_DARKMODE_STATE] = false,
     _a);
+var _b = l(INITIAL_STATES), useGlobalState = _b.useGlobalState;
+
+var DEFAULT_BREAK_POINT = {
+    i: function () { return reactNative.Platform.OS !== 'ios'; },
+    a: function () { return reactNative.Platform.OS !== 'android'; },
+    l: function (dark) { return dark; },
+    d: function (dark) { return !dark; },
+    pad: function () { return SCREEN_TYPE !== 'pad'; },
+    lg: function () { return SCREEN_TYPE !== 'lg'; },
+    sm: function () { return SCREEN_TYPE !== 'sm'; },
+};
 
 /**
  * Check if string is contain only digit
@@ -143,46 +176,25 @@ var INITIAL_STATES = (_a = {},
 var isOnlyDigit = /^\d+$/;
 
 var selColor = function (style, select, defaultColor) {
-    var out = defaultColor;
+    var key = select.toUpperCase();
     switch (select) {
-        case 'white':
-            out = style.COLORS.WHITE;
-            break;
-        case 'prime':
-            out = style.COLORS.PRIME;
-            break;
-        case 'purble':
-            out = style.COLORS.PURPLE;
-            break;
-        case 'blue':
-            out = style.COLORS.BLUE;
-            break;
-        case 'orange':
-            out = style.COLORS.ORANGE;
-            break;
-        case 'red':
-            out = style.COLORS.RED;
-            break;
-        case 'green':
-            out = style.COLORS.GREEN;
-            break;
-        case 'black':
-            out = style.COLORS.BLACK;
-            break;
         case 'med':
-            out = style.COLORS.BACKGROUND_MED;
+            key = 'BACKGROUND_MED';
             break;
         case 'light':
-            out = style.COLORS.BACKGROUND_LIGHT;
+            key = 'BACKGROUND_LIGHT';
             break;
         case 'fhard':
-            out = style.COLORS.FONT_HARD;
+            key = 'FONT_HARD';
             break;
         case 'flight':
-            out = style.COLORS.FONT_LIGHT;
+            key = 'FONT_LIGHT';
             break;
     }
-    return out;
+    if (key in style.COLORS) {
+        return style.COLORS[key];
+    }
+    return defaultColor;
 };
 var ColorBuilder = function (style) { return ({
     white: function () { return ({ color: style.COLORS.WHITE }); },
@@ -210,6 +222,7 @@ var ColorBuilder = function (style) { return ({
 var BorderBuilder = function (style) { return ({
     ba: function () { return ({
         borderStyle: 'solid',
+        borderWidth: 1,
     }); },
     bdot: function () { return ({
         borderStyle: 'dotted',
@@ -226,25 +239,25 @@ var BorderBuilder = function (style) { return ({
     bc: function (color) { return ({
         borderColor: selColor(style, color, style.COLORS.FONT_HARD),
     }); },
-    'br--btn': function () { return ({
+    brBtn: function () { return ({
         borderRadius: style.BORDER.RADIUS.default,
     }); },
-    'br--pill': function () { return ({
+    brPill: function () { return ({
         borderRadius: style.BORDER.RADIUS.pill,
     }); },
-    'br--bottom': function () { return ({
+    brBottom: function () { return ({
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
     }); },
-    'br--top': function () { return ({
+    brTop: function () { return ({
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
     }); },
-    'br--right': function () { return ({
+    brRight: function () { return ({
         borderTopLeftRadius: 0,
         borderBottomLeftRadius: 0,
     }); },
-    'br--left': function () { return ({
+    brLeft: function () { return ({
         borderBottomRightRadius: 0,
         borderTopRightRadius: 0,
     }); },
@@ -343,7 +356,7 @@ var PositionBuilder = function (style) { return ({
     },
 }); };
 
-var SizeBuilder = function (_style) { return ({
+var SizeBuilder = function (style) { return ({
     vh: function (percent) { return ({
         height: vh(percent),
     }); },
@@ -452,21 +465,22 @@ var UtilsBuilder = function (_style) { return ({
     relative: function () { return ({
         position: 'relative',
     }); },
-    ci: function () { return ({
+    centerItems: function () { return ({
         justifyContent: 'center',
         alignItems: 'center',
     }); },
-    jc: function () { return ({ justifyContent: 'center' }); },
-    js: function () { return ({ justifyContent: 'flex-start' }); },
-    je: function () { return ({ justifyContent: 'flex-end' }); },
-    ic: function () { return ({ alignItems: 'center' }); },
-    is: function () { return ({ alignItems: 'flex-start' }); },
-    ie: function () { return ({ alignItems: 'flex-end' }); },
+    justifyCenter: function () { return ({ justifyContent: 'center' }); },
+    justifyStart: function () { return ({ justifyContent: 'flex-start' }); },
+    justifyEnd: function () { return ({ justifyContent: 'flex-end' }); },
+    itemsCenter: function () { return ({ alignItems: 'center' }); },
+    itemsStart: function () { return ({ alignItems: 'flex-start' }); },
+    itemsEnd: function () { return ({ alignItems: 'flex-end' }); },
     flexWrap: function () { return ({ flexWrap: 'wrap' }); },
-    row: function () { return ({
+    flexNoWrap: function () { return ({ flexWrap: 'nowrap' }); },
+    flexRow: function () { return ({
         flexDirection: 'row',
     }); },
-    col: function () { return ({
+    flexCol: function () { return ({
         flexDirection: 'column',
     }); },
     shadow: function (depth, color) {
@@ -497,7 +511,9 @@ var UtilsBuilder = function (_style) { return ({
             transform: [{ scale: value }],
         });
     },
-    'of--hidden': function () { return ({ overflow: 'hidden' }); },
+    ofVisible: function () { return ({ overflow: 'visible' }); },
+    ofHidden: function () { return ({ overflow: 'hidden' }); },
+    ofScroll: function () { return ({ overflow: 'scroll' }); },
 }); };
 
 var styleBuilders = function (style) { return (__assign(__assign(__assign(__assign(__assign(__assign({}, BorderBuilder(style)), PositionBuilder()), TextBuilder(style)), SizeBuilder()), UtilsBuilder()), ColorBuilder(style))); };
@@ -517,36 +533,30 @@ var getStyle = function (dark, prefix, commands, overrideBuilder) {
     }
     return false;
 };
-var breakpoint = {
-    i: function () { return reactNative.Platform.OS === 'android'; },
-    a: function () { return reactNative.Platform.OS === 'ios'; },
-    l: function (dark) { return dark; },
-    d: function (dark) { return !dark; },
-    pad: function () { return SCREEN_TYPE !== 'pad'; },
-    lg: function () { return SCREEN_TYPE !== 'lg'; },
-    sm: function () { return SCREEN_TYPE !== 'sm'; },
-};
 /**
  * Check if string builder have break point
  * @param commands array of builder string
  * @param args extras variable to passthrough
  */
-var checkBreakPoint = function (commands) {
+var checkBreakPoint = function (commands, breakpoints) {
+    if (breakpoints === void 0) { breakpoints = {}; }
     var args = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        args[_i - 1] = arguments[_i];
+    for (var _i = 2; _i < arguments.length; _i++) {
+        args[_i - 2] = arguments[_i];
     }
+    var bkps = __assign(__assign({}, DEFAULT_BREAK_POINT), breakpoints);
     for (var _a = 0, commands_1 = commands; _a < commands_1.length; _a++) {
         var token = commands_1[_a];
-        if (breakpoint[token]) {
-            return breakpoint[token].apply(breakpoint, args);
+        if (bkps[token]) {
+            return bkps[token].apply(bkps, args);
         }
     }
     return false;
 };
-var s$1 = function (isDarkMode, override) {
+var s = function (isDarkMode, breakpoints, overrideStyle) {
     if (isDarkMode === void 0) { isDarkMode = false; }
-    if (override === void 0) { override = {}; }
+    if (breakpoints === void 0) { breakpoints = {}; }
+    if (overrideStyle === void 0) { overrideStyle = {}; }
     var dark = isDarkMode ? 'dark' : 'light';
     /**
      * Convert tachyons syntax string to react native style
@@ -575,30 +585,32 @@ var s$1 = function (isDarkMode, override) {
             var part = parts_1[_i];
             var out = false;
             var commands = part.split('-');
-            if (checkBreakPoint(commands, isDarkMode)) {
+            if (checkBreakPoint(commands, breakpoints, isDarkMode)) {
                 continue;
             }
-            commands = commands.filter(function (val) { return !['pad', 'sm', 'lg', 'a', 'i'].includes(val); });
+            commands = commands.filter(function (val) { return !Object.keys(breakpoints).includes(val); });
             switch (commands.length) {
                 case 1: {
-                    out = getStyle(isDarkMode, part, undefined, override);
+                    out = getStyle(isDarkMode, part, undefined, overrideStyle);
                     break;
                 }
                 case 2: {
-                    out = getStyle(isDarkMode, commands[0], [isOnlyDigit.test(commands[1]) || commands[1].includes('.') ? parseInt(commands[1], 10) : commands[1]], override);
+                    out = getStyle(isDarkMode, commands[0], [isOnlyDigit.test(commands[1]) || commands[1].includes('.') ? parseInt(commands[1], 10) : commands[1]], overrideStyle);
                     break;
                 }
                 case 3: {
                     var prefix = commands.shift();
-                    if (commands[0]) {
-                        out = getStyle(isDarkMode, prefix, commands, override);
-                        break;
+                    if (prefix) {
+                        if (commands[0]) {
+                            out = getStyle(isDarkMode, prefix, commands, overrideStyle);
+                            break;
+                        }
+                        if (isOnlyDigit.test(commands[1]) || commands[1].includes('.')) {
+                            out = getStyle(isDarkMode, prefix, [parseInt(commands[1], 10) * -1], overrideStyle);
+                            break;
+                        }
                     }
-                    if (isOnlyDigit.test(commands[1]) || commands[1].includes('.')) {
-                        out = getStyle(isDarkMode, prefix, [parseInt(commands[1], 10) * -1], override);
-                        break;
-                    }
-                    out = getStyle(isDarkMode, part, undefined, override);
+                    out = getStyle(isDarkMode, part, undefined, overrideStyle);
                 }
             }
             if (out) {
@@ -619,42 +631,57 @@ var s$1 = function (isDarkMode, override) {
     return prebuilt;
 };
 
-const s=(e,t)=>{if(!e.includes(t))throw new Error(`'${t}' not found. It must be provided in initialState as a property key.`)},c="production"!==process.env.NODE_ENV?Symbol("UPDATE_STATE"):Symbol(),a=(a,l)=>{const u=Object.keys(l);let i=l,d=null;const p={};u.forEach(e=>{p[e]=new Set;});const E=(e,t)=>t.type===c?t.r?t.r(e):t.e:a(e,t),f=(e,t)=>{"production"!==process.env.NODE_ENV&&s(u,e);const r=r=>{return {...r,[e]:(o=r[e],n=t,"function"==typeof n?n(o):n)};var o,n;};if(d)d({type:c,r});else {i=r(i);const t=i[e];p[e].forEach(e=>e(t));}},S=(e,t)=>{u.forEach(r=>{const o=t[r];e[r]!==o&&p[r].forEach(e=>e(o));});};return {useGlobalStateProvider:()=>{const[o,n]=react.useReducer(E,i);react.useEffect(()=>{if(d)throw new Error("Only one global state provider is allowed");return d=n,n({type:c,e:i}),()=>{d=null;}},[]);const s=react.useRef(o);S(s.current,o),s.current=o,react.useEffect(()=>{i=o;},[o]);},useGlobalState:e=>{"production"!==process.env.NODE_ENV&&s(u,e);const[r,c]=react.useState(i[e]);return react.useEffect(()=>(p[e].add(c),c(i[e]),()=>{p[e].delete(c);}),[e]),[r,react.useCallback(t=>f(e,t),[e])]},getGlobalState:e=>("production"!==process.env.NODE_ENV&&s(u,e),i[e]),setGlobalState:f,getState:()=>i,setState:e=>{if(d)d({type:c,e});else {const t=i;i=e,S(t,i);}},dispatch:e=>{if(d)d(e);else {const t=i;i=a(i,e),S(t,i);}return e}}},l=e=>a((e,t)=>e,e);
-
-var useGlobalState = l(INITIAL_STATES).useGlobalState;
-/**
- * Override current app style
- * @param style New style for app
- * @param isLightStyle True for set light theme
- */
-var useOverrideStyle = function (style, isLightStyle) {
-    if (isLightStyle === void 0) { isLightStyle = true; }
-    if (isLightStyle) {
-        var _a = useGlobalState(GLOBAL_LIGHT_STYLE_KEY), setStyle = _a[1];
-        setStyle(__assign(__assign({}, LIGHT_STYLE), style));
-    }
-    else {
-        var _b = useGlobalState(GLOBAL_DARK_STYLE_KEY), setStyle = _b[1];
-        setStyle(__assign(__assign({}, DARK_STYLE), style));
-    }
-};
-/**
- * Define your custom build rules
- * @param rules Your custom rules
- * ## Example
- * ```js
- * { "wh": (arg1, arg2) => ({width: arg1, height: arg2}) }
- * ```
- * `wh-10-22` will be { width: 10, height: 22 }
- * ```js
- * { "pa--l1": () => ({ padding: $l1 }) }
- * ```
- * `pa--btn` will be { padding: $l1 }
- */
-var useOverrideRules = function (rules) {
-    if (rules === void 0) { rules = {}; }
-    var _a = useGlobalState(GLOBAL_STYLE_RULE_KEY), setRules = _a[1];
-    setRules(rules || []);
+var useOverrideBuilder = function () {
+    var _a = useGlobalState(GLOBAL_STYLE_RULE_KEY), crrRule = _a[0], setRules = _a[1];
+    var _b = useGlobalState(GLOBAL_LIGHT_STYLE_KEY), crrLight = _b[0], setLightStyle = _b[1];
+    var _c = useGlobalState(GLOBAL_DARK_STYLE_KEY), crrDark = _c[0], setDarkStyle = _c[1];
+    var _d = useGlobalState(GLOBAL_BREAKPOINT_KEY), crrBreaks = _d[0], setBreakPoint = _d[1];
+    /**
+     * Define your custom build rules
+     * @param rules Your custom rules
+     * ## Example
+     * ```js
+     * { "wh": (arg1, arg2) => ({width: arg1, height: arg2}) }
+     * ```
+     * `wh-10-22` will be { width: 10, height: 22 }
+     * ```js
+     * { "pa--l1": () => ({ padding: $l1 }) }
+     * ```
+     * `pa--btn` will be { padding: $l1 }
+     */
+    var overrideRules = function (newRule) {
+        setRules(__assign(__assign({}, crrRule), newRule));
+    };
+    /**
+     * Override current app style
+     * @param style New style for app
+     * @param isLightStyle True for set light theme
+     */
+    var overrideStyle = function (style, isLightStyle) {
+        if (isLightStyle === void 0) { isLightStyle = true; }
+        if (isLightStyle) {
+            setLightStyle(__assign(__assign({}, crrLight), style));
+        }
+        else {
+            setDarkStyle(__assign(__assign({}, crrDark), style));
+        }
+    };
+    /**
+     * Add new breakpoint into builder
+     * ```js
+     * {
+     * i: () => Platform.OS !== 'ios'
+     * a: () => Platform.OS !== 'android'
+     * }
+     * ```
+     * => `w-10-i` will only in `ios`
+     * and `w-10-a` will only in `android`
+     * @param breakpoints New breakpoint to be declare
+     */
+    var overrideBreakpoint = function (breakpoints) {
+        setBreakPoint(__assign(__assign({}, crrBreaks), breakpoints));
+    };
+    return { overrideRules: overrideRules, overrideStyle: overrideStyle, overrideBreakpoint: overrideBreakpoint };
 };
 /**
  * Return current dark mode status and set function
@@ -683,12 +710,13 @@ var useStyleBuilder = function () {
     var style = useDynamicStyle()[0];
     var _a = useDarkMode(), isDarkMode = _a.isDarkMode, setDarkMode = _a.setDarkMode;
     var overrideRules = useGlobalState(GLOBAL_STYLE_RULE_KEY)[0];
-    return { s: s$1(isDarkMode, overrideRules), style: style, isDarkMode: isDarkMode, setDarkMode: setDarkMode };
+    var breakpoints = useGlobalState(GLOBAL_BREAKPOINT_KEY)[0];
+    return { s: s(isDarkMode, breakpoints, overrideRules), style: style, isDarkMode: isDarkMode, setDarkMode: setDarkMode };
 };
 
+exports.setSizeConfig = setSizeConfig;
 exports.useDarkMode = useDarkMode;
 exports.useDynamicStyle = useDynamicStyle;
-exports.useOverrideRules = useOverrideRules;
-exports.useOverrideStyle = useOverrideStyle;
+exports.useOverrideBuilder = useOverrideBuilder;
 exports.useStyleBuilder = useStyleBuilder;
 //# sourceMappingURL=index.js.map

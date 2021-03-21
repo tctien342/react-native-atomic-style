@@ -90,3 +90,42 @@ interface IAppStyles {
 }
 
 type TStringBuilder = (style: IAppStyles) => { [key: string]: (...args) => { [key: string]: any } };
+
+interface ISizeConfig {
+  /**
+   * Current scale you are work in, this will affect auto scale of width, height and fontSize.
+   * Default base on Iphone5 => ScreenWidth / 320
+   */
+  scaleBase: number;
+  /**
+   * Scale value when breakpoint change
+   */
+  scaleSize: {
+    /**
+     * Small screen default 0.95
+     */
+    sm: number;
+    /**
+     * Large screen default 1
+     */
+    lg: number;
+    /**
+     * Pad screen default 0.9
+     */
+    pad: number;
+  };
+  scalePoint: {
+    /**
+     * Ratio of big screen and small screen
+     *
+     * large <===> x1 <===> small <===> x2 <===> pad
+     */
+    x1: number;
+    /**
+     * Ratio of small screen and pad screen
+     *
+     * large <===> x1 <===> small <===> x2 <===> pad
+     */
+    x2: number;
+  };
+}

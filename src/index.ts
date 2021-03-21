@@ -6,6 +6,7 @@
 //         \/     \/        \/             \/
 // React Native Atomic Style
 
-import { useDarkMode, useDynamicStyle, useOverrideRules, useOverrideStyle, useStyleBuilder } from '@hooks/index';
+import { setSizeConfig } from '@constants/size';
+import { useDarkMode, useDynamicStyle, useOverrideBuilder, useStyleBuilder } from '@hooks/index';
 
-export { useDarkMode, useDynamicStyle, useOverrideRules, useOverrideStyle, useStyleBuilder };
+export { setSizeConfig, useDarkMode, useDynamicStyle, useOverrideBuilder, useStyleBuilder };

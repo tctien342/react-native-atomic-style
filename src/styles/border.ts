@@ -3,6 +3,7 @@ import { selColor } from './color';
 export const BorderBuilder: TStringBuilder = (style: IAppStyles) => ({
   ba: () => ({
     borderStyle: 'solid',
+    borderWidth: 1,
   }),
   bdot: () => ({
     borderStyle: 'dotted',
@@ -19,25 +20,25 @@ export const BorderBuilder: TStringBuilder = (style: IAppStyles) => ({
   bc: (color: string) => ({
     borderColor: selColor(style, color, style.COLORS.FONT_HARD),
   }),
-  'br--btn': () => ({
+  brBtn: () => ({
     borderRadius: style.BORDER.RADIUS.default,
   }),
-  'br--pill': () => ({
+  brPill: () => ({
     borderRadius: style.BORDER.RADIUS.pill,
   }),
-  'br--bottom': () => ({
+  brBottom: () => ({
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
   }),
-  'br--top': () => ({
+  brTop: () => ({
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
   }),
-  'br--right': () => ({
+  brRight: () => ({
     borderTopLeftRadius: 0,
     borderBottomLeftRadius: 0,
   }),
-  'br--left': () => ({
+  brLeft: () => ({
     borderBottomRightRadius: 0,
     borderTopRightRadius: 0,
   }),

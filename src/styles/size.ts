@@ -1,7 +1,7 @@
-import { MIN_DIMENSION } from '@constants/const';
+import { MIN_DIMENSION } from '@constants/size';
 import { reScale, vh, vw } from '@utils/style';
 
-export const SizeBuilder: TStringBuilder = (_style: IAppStyles) => ({
+export const SizeBuilder: TStringBuilder = (style: IAppStyles) => ({
   vh: (percent: number) => ({
     height: vh(percent),
   }),
