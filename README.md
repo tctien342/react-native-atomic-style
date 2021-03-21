@@ -2,6 +2,10 @@
 
 Make your react style more easier
 
+#### Install
+
+`yarn add @tctien342/react-native-atomic-style`
+
 #### Config functions
 
 - setSizeConfig() `Config scale`
