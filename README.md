@@ -7,7 +7,36 @@ Make your react style more easier
 - useOverrideBuilder()
 - useDarkMode() => {isDarkMode, setDarkMode}
 - useDynamicStyle => [currentStyle, isDarkMode]
-- useStyleBuilder => { `` ts /** * Convert tachyons syntax string to react native style * @param styleString String of multi prefix tachyons syntax * @example * // Note: `vw` and `vh` or anything relate to view size will calculated as percent of phone's screen * s(`vw-100 vh-100`) as {height: vh(100), width: vw(100)} * s(`w-100 h-100`) as {height: 100, width: 100} * s(`w-100% h-100%`) as {height: '100%', width: '100%'} * s(`bg`) as {background: style.COLOR.BACKGROUND_HARD} * s(`red`) as {color: style.COLOR.RED} * s(`relative`) as {position: 'relative'} * s(`f1 prime bold`) as {fontSize: style.FONT.SIZE.xl, color: style.COLORS.PRIME, fontWeight: style.FONT.WEIGHT.bold} */ s:(str) /** * Current style of app */ style: IAppStyles; /** * Current dark mode status */ isDarkMode: boolean; /** * Set dark mode status */ setDarkMode: (u: React.SetStateAction<boolean>) => void;  `` }
+- useStyleBuilder => { 
+  ```ts
+    /**
+	 * Convert tachyons syntax string to react native style
+	 * @param styleString String of multi prefix tachyons syntax
+	 * @example
+	 * // Note: `vw` and `vh` or anything relate to view size will calculated as percent of phone's screen
+	 * s(`vw-100 vh-100`) as {height: vh(100), width: vw(100)}
+	 * s(`w-100 h-100`) as {height: 100, width: 100}
+	 * s(`w-100% h-100%`) as {height: '100%', width: '100%'}
+	 * s(`bg`) as {background: style.COLOR.BACKGROUND_HARD}
+	 * s(`red`) as {color: style.COLOR.RED}
+	 * s(`relative`) as {position: 'relative'}
+	 * s(`f1 prime bold`) as {fontSize: style.FONT.SIZE.xl, color: style.COLORS.PRIME, fontWeight: style.FONT.WEIGHT.bold}
+	 */
+    s:(str)
+    /**
+	 * Current style of app
+	 */
+	style: IAppStyles;
+	/**
+	 * Current dark mode status
+	 */
+	isDarkMode: boolean;
+	/**
+	 * Set dark mode status
+	 */
+	setDarkMode: (u: React.SetStateAction<boolean>) => void;
+    ```
+}
 - useOverrideRules(rules)
 
 #### Import hook and using it
@@ -120,78 +149,78 @@ const DARK_STYLE: IAppStyles = {
 
 > You can override using `useOverrideBuilder` hook and use `overrideRules`
 
-| Command | About | Note |
-| :-- | :-- | :-- | --- |
-| <b>View Size |  |  |
-| vw-{size} | Width base on screen's width | value as percent |
-| vh-{size} | Height base on screen's height | value as percent |
-| wh-{size} | Height = Width = min screen's dimentions (Square view) | value as percent |
-| h-{size} | height of view, base on parent size for percent or pixel | can be h-100% for 100% or h-100 for 100px |
-| w-{size} | width of view, base on parent size for percent or pixel | can be w-100% for 100% or w-100 for 100px |
-| mh-{size} | maxHeight of view, base on parent size for percent or pixel | can be mh-100% for 100% or mh-100 for 100px |
-| mw-{size} | maxWidth of view, base on parent size for percent or pixel | can be mw-100% for 100% or mw-100 for 100px |
-| mvh-{size} | maxHeight of view, base on phone's height | value as percent |
-| mvw-{size} | maxWidth of view, base on phone's width | value as percent |
-| flex-{size} | define flex size of view | value as number, default is 1 |
-| <b>Text styles |  |
-| tc | textAlign: center |  |
-| tl | textAlign: left |  |
-| tr | textAlign: right |  |
-| f1 | fontSize: \${xlSize} |  |
-| f2 | fontSize: \${lSize} |  |
-| f3 | fontSize: \${mSize} |  |
-| f4 | fontSize: \${sSize} |  |
-| f5 | fontSize: \${xsSize} |  |
-| bold | fontWeight: \${boldSize} |  |
-| thin | fontWeight: \${thinSize} |  |
-| <b>Object position |  |
-| absolute | position: absolute |  |
-| relative | position: relative |  |
-| top-{pos} | set top position | can be top-10 for 10px or top-10% for 10% from top |
-| bottom-{pos} | set bottom position | can be bottom-10 for 10px or bottom-10% for 10% from bottom |
-| left-{pos} | set left position | can be left-10 for 10px or left-10% for 10% from left |
-| right-{pos} | set right position | can be right-10 for 10px or right-10% for 10% from right |
-| z-{index} | set zIndex of view | value as number > 0 only |
-| pa-{size} | padding view by size | size can be `10%` for percent or `10` for pixel |
-| pt-{size} | paddingTop view by size | size can be `10%` for percent or `10` for pixel |
-| pb-{size} | paddingBottom view by size | size can be `10%` for percent or `10` for pixel |
-| pl-{size} | paddingLeft view by size | size can be `10%` for percent or `10` for pixel |
-| pr-{size} | paddingRight view by size | size can be `10%` for percent or `10` for pixel |
-| ma-{size} | margin view by size | size can be `10%` for percent or `10` for pixel |
-| mt-{size} | marginTop view by size | size can be `10%` for percent or `10` for pixel |
-| mb-{size} | marginBottom view by size | size can be `10%` for percent or `10` for pixel |
-| ml-{size} | marginLeft view by size | size can be `10%` for percent or `10` for pixel |
-| mr-{size} | marginRight view by size | size can be `10%` for percent or `10` for pixel |
-| <b>Border properties |  |
-| ba | borderStyle solid |  |
-| bdot | borderStyle dotted |  |
-| bdash | borderStyle dashed |  |
-| bw-{size} | borderWidth size | size can be `10%` for percent or `10` for pixel |
-| br-{size} | borderRadius size, default as \${Input Radius} | size can be `10%` for percent or `10` for pixel | percent or `10` for pixel |
-| brPill | borderRadius \${pill radius} |  |
-| brBottom | borderRadius only bottom |  |
-| brTop | borderRadius only top |  |
-| brLeft | borderRadius only left |  |
-| brRight | borderRadius only right |  |
-| <b>Utils properties |  |
-| centerItems | center all items in view |  |
-| justifyCenter | justifyContent center |  |
-| itemsCenter | alignItems center |  |
-| flexRow | flexDirection: row |  |
-| flexColumn | flexDirection: column |  |
-| shadow-${depth}-${color} | Drop shadow to view | depth as number default 3, color default #000, depth and color only work on ios |
-| <b>Color properties |  |
-| o-{alpha} | opacity: alpha size | alpha size from 0-100 as percent |
-| white | color: \${white} |
-| prime | color: \${prime} |
-| purble | color: \${purble} |
-| blue | color: \${blue} |
-| orange | color: \${orange} |
-| red | color: \${red} |
-| green | color: \${green} |
-| black | color: \${black} |
-| light | color: \${fontLight} |
-| hard | color: \${fontHard} |
-| bg-{color} | backgroundColor: color, support all above color, default as \${backgroundHard} | `light` and `hard` color with changed to `flight` and `fhard` |
-| bg-med | color: \${backgroundMedium} |
-| bg-light | color: \${backgroundLight} |
+| Command                  | About                                                                          | Note                                                                            |
+| :----------------------- | :----------------------------------------------------------------------------- | :------------------------------------------------------------------------------ |
+| <b>View Size             |                                                                                |                                                                                 |
+| vw-{size}                | Width base on screen's width                                                   | value as percent                                                                |
+| vh-{size}                | Height base on screen's height                                                 | value as percent                                                                |
+| wh-{size}                | Height = Width = min screen's dimentions (Square view)                         | value as percent                                                                |
+| h-{size}                 | height of view, base on parent size for percent or pixel                       | can be h-100% for 100% or h-100 for 100px                                       |
+| w-{size}                 | width of view, base on parent size for percent or pixel                        | can be w-100% for 100% or w-100 for 100px                                       |
+| mh-{size}                | maxHeight of view, base on parent size for percent or pixel                    | can be mh-100% for 100% or mh-100 for 100px                                     |
+| mw-{size}                | maxWidth of view, base on parent size for percent or pixel                     | can be mw-100% for 100% or mw-100 for 100px                                     |
+| mvh-{size}               | maxHeight of view, base on phone's height                                      | value as percent                                                                |
+| mvw-{size}               | maxWidth of view, base on phone's width                                        | value as percent                                                                |
+| flex-{size}              | define flex size of view                                                       | value as number, default is 1                                                   |
+| <b>Text styles           |                                                                                |
+| tc                       | textAlign: center                                                              |                                                                                 |
+| tl                       | textAlign: left                                                                |                                                                                 |
+| tr                       | textAlign: right                                                               |                                                                                 |
+| f1                       | fontSize: \${xlSize}                                                           |                                                                                 |
+| f2                       | fontSize: \${lSize}                                                            |                                                                                 |
+| f3                       | fontSize: \${mSize}                                                            |                                                                                 |
+| f4                       | fontSize: \${sSize}                                                            |                                                                                 |
+| f5                       | fontSize: \${xsSize}                                                           |                                                                                 |
+| bold                     | fontWeight: \${boldSize}                                                       |                                                                                 |
+| thin                     | fontWeight: \${thinSize}                                                       |                                                                                 |
+| <b>Object position       |                                                                                |
+| absolute                 | position: absolute                                                             |                                                                                 |
+| relative                 | position: relative                                                             |                                                                                 |
+| top-{pos}                | set top position                                                               | can be top-10 for 10px or top-10% for 10% from top                              |
+| bottom-{pos}             | set bottom position                                                            | can be bottom-10 for 10px or bottom-10% for 10% from bottom                     |
+| left-{pos}               | set left position                                                              | can be left-10 for 10px or left-10% for 10% from left                           |
+| right-{pos}              | set right position                                                             | can be right-10 for 10px or right-10% for 10% from right                        |
+| z-{index}                | set zIndex of view                                                             | value as number > 0 only                                                        |
+| pa-{size}                | padding view by size                                                           | size can be `10%` for percent or `10` for pixel                                 |
+| pt-{size}                | paddingTop view by size                                                        | size can be `10%` for percent or `10` for pixel                                 |
+| pb-{size}                | paddingBottom view by size                                                     | size can be `10%` for percent or `10` for pixel                                 |
+| pl-{size}                | paddingLeft view by size                                                       | size can be `10%` for percent or `10` for pixel                                 |
+| pr-{size}                | paddingRight view by size                                                      | size can be `10%` for percent or `10` for pixel                                 |
+| ma-{size}                | margin view by size                                                            | size can be `10%` for percent or `10` for pixel                                 |
+| mt-{size}                | marginTop view by size                                                         | size can be `10%` for percent or `10` for pixel                                 |
+| mb-{size}                | marginBottom view by size                                                      | size can be `10%` for percent or `10` for pixel                                 |
+| ml-{size}                | marginLeft view by size                                                        | size can be `10%` for percent or `10` for pixel                                 |
+| mr-{size}                | marginRight view by size                                                       | size can be `10%` for percent or `10` for pixel                                 |
+| <b>Border properties     |                                                                                |
+| ba                       | borderStyle solid                                                              |                                                                                 |
+| bdot                     | borderStyle dotted                                                             |                                                                                 |
+| bdash                    | borderStyle dashed                                                             |                                                                                 |
+| bw-{size}                | borderWidth size                                                               | size can be `10%` for percent or `10` for pixel                                 |
+| br-{size}                | borderRadius size, default as \${Input Radius}                                 | size can be `10%` for percent or `10` for pixel                                 | percent or `10` for pixel |
+| brPill                 | borderRadius \${pill radius}                                                   |                                                                                 |
+| brBottom               | borderRadius only bottom                                                       |                                                                                 |
+| brTop                  | borderRadius only top                                                          |                                                                                 |
+| brLeft                 | borderRadius only left                                                         |                                                                                 |
+| brRight                | borderRadius only right                                                        |                                                                                 |
+| <b>Utils properties      |                                                                                |
+| centerItems              | center all items in view                                                       |                                                                                 |
+| justifyCenter            | justifyContent center                                                          |                                                                                 |
+| itemsCenter              | alignItems center                                                              |                                                                                 |
+| flexRow                      | flexDirection: row                                                             |                                                                                 |
+| flexColumn                   | flexDirection: column                                                          |                                                                                 |
+| shadow-${depth}-${color} | Drop shadow to view                                                            | depth as number default 3, color default #000, depth and color only work on ios |
+| <b>Color properties      |                                                                                |
+| o-{alpha}                | opacity: alpha size                                                            | alpha size from 0-100 as percent                                                |
+| white                    | color: \${white}                                                               |
+| prime                    | color: \${prime}                                                               |
+| purble                   | color: \${purble}                                                              |
+| blue                     | color: \${blue}                                                                |
+| orange                   | color: \${orange}                                                              |
+| red                      | color: \${red}                                                                 |
+| green                    | color: \${green}                                                               |
+| black                    | color: \${black}                                                               |
+| light                    | color: \${fontLight}                                                           |
+| hard                     | color: \${fontHard}                                                            |
+| bg-{color}               | backgroundColor: color, support all above color, default as \${backgroundHard} | `light` and `hard` color with changed to `flight` and `fhard`                   |
+| bg-med                   | color: \${backgroundMedium}                                                    |
+| bg-light                 | color: \${backgroundLight}                                                     |
