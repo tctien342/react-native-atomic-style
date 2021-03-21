@@ -2,6 +2,9 @@
 
 Make your react style more easier
 
+#### Config functions
+
+- setSizeConfig() `Config scale`
 #### Support hooks
 
 - useOverrideBuilder()
@@ -37,7 +40,6 @@ Make your react style more easier
 	setDarkMode: (u: React.SetStateAction<boolean>) => void;
     ```
 }
-- useOverrideRules(rules)
 
 #### Import hook and using it
 
@@ -61,6 +63,7 @@ Make your react style more easier
 ```
 
 #### Support breaks point
+> Your change override or add breakpoint by use `useOverrideBuilder` and pick `overrideBreakpoint`
 
 ```ts
 const breakpoint = {
@@ -86,7 +89,7 @@ s('w-10% w-20%-sm');
 
 ### Default config
 
-> You can override style by using `useOverrideBuilder` hook and use `overrideStyle`
+> Your change override or add breakpoint by use `useOverrideBuilder` and pick `overrideStyle`
 
 ```ts
 const LIGHT_STYLE: IAppStyles = {
