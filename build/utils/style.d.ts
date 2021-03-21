@@ -13,4 +13,4 @@ declare const vw: (percent: number) => number;
  * @param percent 0-100 percent of view height
  */
 declare const vh: (percent: number) => number;
-export { reScale, vw, vh };
+export { reScale, vh, vw };

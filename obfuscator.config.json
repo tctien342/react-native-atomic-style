@@ -1,0 +1,15 @@
+{
+  "compact": true,
+  "controlFlowFlattening": false,
+  "debugProtection": false,
+  "disableConsoleOutput": false,
+  "numbersToExpressions": false,
+  "renameProperties": false,
+  "ignoreRequireImports": true,
+  "stringArray": false,
+  "rotateStringArray": false,
+  "selfDefending": false,
+  "splitStrings": false,
+  "splitStringsChunkLength": 15,
+  "transformObjectKeys": true
+}

@@ -1,4 +1,4 @@
-import { StyleProp } from "react-native";
+import { StyleProp } from 'react-native';
 export declare const styleBuilders: (style: IAppStyles) => {
     [x: string]: (...args: any[]) => {
         [key: string]: any;

@@ -37,11 +37,11 @@ function __spreadArray(to, from) {
     return to;
 }
 
-var _a = reactNative.Dimensions.get("window"), SCREEN_WIDTH = _a.width, SCREEN_HEIGHT = _a.height;
+var _a$1 = reactNative.Dimensions.get('window'), SCREEN_WIDTH = _a$1.width, SCREEN_HEIGHT = _a$1.height;
 var SCALE_BASE = SCREEN_WIDTH / 320; // based on iPhone 5s's scale
 var MIN_DIMENSION = Math.min(SCREEN_WIDTH, SCREEN_HEIGHT);
 var SCREEN_RATIO = SCREEN_HEIGHT / SCREEN_WIDTH;
-var SCREEN_TYPE = SCREEN_RATIO > 1.8 ? "lg" : SCREEN_RATIO > 4 / 3 ? "sm" : "pad";
+var SCREEN_TYPE = SCREEN_RATIO > 1.8 ? 'lg' : SCREEN_RATIO > 4 / 3 ? 'sm' : 'pad';
 
 /**
  * Resize an size base on scale value
@@ -53,14 +53,14 @@ var reScale = function (size, scale) {
         return 1;
     var newSize = size * scale;
     switch (SCREEN_TYPE) {
-        case "sm":
+        case 'sm':
             newSize *= 0.95;
             break;
-        case "pad":
+        case 'pad':
             newSize *= 0.9;
             break;
     }
-    if (reactNative.Platform.OS === "ios") {
+    if (reactNative.Platform.OS === 'ios') {
         return Math.round(reactNative.PixelRatio.roundToNearestPixel(newSize));
     }
     else {
@@ -91,20 +91,20 @@ var DEFAULT_VAL = {
 };
 var LIGHT_STYLE = {
     COLORS: {
-        PRIME: "#389bff",
-        PURPLE: "#9b71de",
-        BLUE: "blue",
-        RED: "#de2f2f",
-        ORANGE: "orange",
-        GREEN: "green",
-        WHITE: "white",
-        FONT_LIGHT: "#717171",
-        FONT_HARD: "#2b2b2b",
-        BACKGROUND_LIGHT: "#f6f6f6",
-        BACKGROUND_MED: "white",
-        BACKGROUND_HARD: "white",
-        BLACK: "#000",
-        GRAY: "#b6c0cc",
+        PRIME: '#389bff',
+        PURPLE: '#9b71de',
+        BLUE: 'blue',
+        RED: '#de2f2f',
+        ORANGE: 'orange',
+        GREEN: 'green',
+        WHITE: 'white',
+        FONT_LIGHT: '#717171',
+        FONT_HARD: '#2b2b2b',
+        BACKGROUND_LIGHT: '#f6f6f6',
+        BACKGROUND_MED: 'white',
+        BACKGROUND_HARD: 'white',
+        BLACK: '#000',
+        GRAY: '#b6c0cc',
     },
     FONT: {
         SIZE: {
@@ -116,15 +116,25 @@ var LIGHT_STYLE = {
             f2: reScale(22),
             f1: reScale(26),
         },
-        WEIGHT: { thin: "200", bold: "bold", default: "normal" },
+        WEIGHT: { thin: '200', bold: 'bold', default: 'normal' },
     },
     BORDER: {
         RADIUS: __assign({ default: reScale(10), pill: reScale(42) }, DEFAULT_VAL),
     },
 };
-var DARK_STYLE = __assign(__assign({}, LIGHT_STYLE), { COLORS: __assign(__assign({}, LIGHT_STYLE.COLORS), { RED: "#ff0266", FONT_LIGHT: "#5D5D5D", FONT_HARD: "#D7D7D7", BACKGROUND_LIGHT: "#585858", BACKGROUND_MED: "#464646", BACKGROUND_HARD: "#333333" }), FONT: __assign(__assign({}, LIGHT_STYLE.FONT), { WEIGHT: { thin: "300", bold: "bold", default: "normal" } }) });
+var DARK_STYLE = __assign(__assign({}, LIGHT_STYLE), { COLORS: __assign(__assign({}, LIGHT_STYLE.COLORS), { RED: '#ff0266', FONT_LIGHT: '#5D5D5D', FONT_HARD: '#D7D7D7', BACKGROUND_LIGHT: '#585858', BACKGROUND_MED: '#464646', BACKGROUND_HARD: '#333333' }), FONT: __assign(__assign({}, LIGHT_STYLE.FONT), { WEIGHT: { thin: '300', bold: 'bold', default: 'normal' } }) });
 
-const s=(e,t)=>{if(!e.includes(t))throw new Error(`'${t}' not found. It must be provided in initialState as a property key.`)},c="production"!==process.env.NODE_ENV?Symbol("UPDATE_STATE"):Symbol(),a=(a,l)=>{const u=Object.keys(l);let i=l,d=null;const p={};u.forEach(e=>{p[e]=new Set;});const E=(e,t)=>t.type===c?t.r?t.r(e):t.e:a(e,t),f=(e,t)=>{"production"!==process.env.NODE_ENV&&s(u,e);const r=r=>{return {...r,[e]:(o=r[e],n=t,"function"==typeof n?n(o):n)};var o,n;};if(d)d({type:c,r});else {i=r(i);const t=i[e];p[e].forEach(e=>e(t));}},S=(e,t)=>{u.forEach(r=>{const o=t[r];e[r]!==o&&p[r].forEach(e=>e(o));});};return {useGlobalStateProvider:()=>{const[o,n]=react.useReducer(E,i);react.useEffect(()=>{if(d)throw new Error("Only one global state provider is allowed");return d=n,n({type:c,e:i}),()=>{d=null;}},[]);const s=react.useRef(o);S(s.current,o),s.current=o,react.useEffect(()=>{i=o;},[o]);},useGlobalState:e=>{"production"!==process.env.NODE_ENV&&s(u,e);const[r,c]=react.useState(i[e]);return react.useEffect(()=>(p[e].add(c),c(i[e]),()=>{p[e].delete(c);}),[e]),[r,react.useCallback(t=>f(e,t),[e])]},getGlobalState:e=>("production"!==process.env.NODE_ENV&&s(u,e),i[e]),setGlobalState:f,getState:()=>i,setState:e=>{if(d)d({type:c,e});else {const t=i;i=e,S(t,i);}},dispatch:e=>{if(d)d(e);else {const t=i;i=a(i,e),S(t,i);}return e}}},l=e=>a((e,t)=>e,e);
+var _a;
+var GLOBAL_LIGHT_STYLE_KEY = 'GLOBAL_LIGHT_STYLE_KEY';
+var GLOBAL_DARK_STYLE_KEY = 'GLOBAL_DARK_STYLE_KEY';
+var GLOBAL_STYLE_RULE_KEY = 'GLOBAL_STYLE_RULE_KEY';
+var GLOBAL_DARKMODE_STATE = 'GLOBAL_DARKMODE_STATE';
+var INITIAL_STATES = (_a = {},
+    _a[GLOBAL_LIGHT_STYLE_KEY] = LIGHT_STYLE,
+    _a[GLOBAL_DARK_STYLE_KEY] = DARK_STYLE,
+    _a[GLOBAL_STYLE_RULE_KEY] = {},
+    _a[GLOBAL_DARKMODE_STATE] = false,
+    _a);
 
 /**
  * Check if string is contain only digit
@@ -232,7 +242,7 @@ var BorderBuilder = function (style) { return ({
     }); },
     'br--right': function () { return ({
         borderTopLeftRadius: 0,
-        borderBottomLeftRadius: 0
+        borderBottomLeftRadius: 0,
     }); },
     'br--left': function () { return ({
         borderBottomRightRadius: 0,
@@ -501,21 +511,20 @@ var getStyle = function (dark, prefix, commands, overrideBuilder) {
     var _a, _b;
     if (commands === void 0) { commands = []; }
     if (overrideBuilder === void 0) { overrideBuilder = {}; }
-    var out = (_b = (_a = (dark
-        ? __assign(__assign({}, darkStyleBuilder), overrideBuilder) : __assign(__assign({}, lightStyleBuilder), overrideBuilder)))[prefix]) === null || _b === void 0 ? void 0 : _b.call.apply(_b, __spreadArray([_a], commands));
+    var out = (_b = (_a = (dark ? __assign(__assign({}, darkStyleBuilder), overrideBuilder) : __assign(__assign({}, lightStyleBuilder), overrideBuilder)))[prefix]) === null || _b === void 0 ? void 0 : _b.call.apply(_b, __spreadArray([_a], commands));
     if (out) {
         return out;
     }
     return false;
 };
 var breakpoint = {
-    i: function () { return reactNative.Platform.OS === "android"; },
-    a: function () { return reactNative.Platform.OS === "ios"; },
+    i: function () { return reactNative.Platform.OS === 'android'; },
+    a: function () { return reactNative.Platform.OS === 'ios'; },
     l: function (dark) { return dark; },
     d: function (dark) { return !dark; },
-    pad: function () { return SCREEN_TYPE !== "pad"; },
-    lg: function () { return SCREEN_TYPE !== "lg"; },
-    sm: function () { return SCREEN_TYPE !== "sm"; },
+    pad: function () { return SCREEN_TYPE !== 'pad'; },
+    lg: function () { return SCREEN_TYPE !== 'lg'; },
+    sm: function () { return SCREEN_TYPE !== 'sm'; },
 };
 /**
  * Check if string builder have break point
@@ -538,7 +547,7 @@ var checkBreakPoint = function (commands) {
 var s$1 = function (isDarkMode, override) {
     if (isDarkMode === void 0) { isDarkMode = false; }
     if (override === void 0) { override = {}; }
-    var dark = isDarkMode ? "dark" : "light";
+    var dark = isDarkMode ? 'dark' : 'light';
     /**
      * Convert tachyons syntax string to react native style
      * @param styleString String of multi prefix tachyons syntax
@@ -561,27 +570,22 @@ var s$1 = function (isDarkMode, override) {
         }
         // Compute string to style object
         var styles = {};
-        var parts = styleString.split(" ");
+        var parts = styleString.split(' ');
         for (var _i = 0, parts_1 = parts; _i < parts_1.length; _i++) {
             var part = parts_1[_i];
             var out = false;
-            var commands = part.split("-");
+            var commands = part.split('-');
             if (checkBreakPoint(commands, isDarkMode)) {
                 continue;
             }
-            commands = commands.filter(function (val) { return !["pad", "sm", "lg", "a", "i"].includes(val); });
+            commands = commands.filter(function (val) { return !['pad', 'sm', 'lg', 'a', 'i'].includes(val); });
             switch (commands.length) {
                 case 1: {
                     out = getStyle(isDarkMode, part, undefined, override);
                     break;
                 }
                 case 2: {
-                    out = getStyle(isDarkMode, commands[0], [
-                        isOnlyDigit.test(commands[1]) ||
-                            commands[1].includes(".")
-                            ? parseInt(commands[1], 10)
-                            : commands[1],
-                    ], override);
+                    out = getStyle(isDarkMode, commands[0], [isOnlyDigit.test(commands[1]) || commands[1].includes('.') ? parseInt(commands[1], 10) : commands[1]], override);
                     break;
                 }
                 case 3: {
@@ -590,8 +594,7 @@ var s$1 = function (isDarkMode, override) {
                         out = getStyle(isDarkMode, prefix, commands, override);
                         break;
                     }
-                    if (isOnlyDigit.test(commands[1]) ||
-                        commands[1].includes(".")) {
+                    if (isOnlyDigit.test(commands[1]) || commands[1].includes('.')) {
                         out = getStyle(isDarkMode, prefix, [parseInt(commands[1], 10) * -1], override);
                         break;
                     }
@@ -616,13 +619,9 @@ var s$1 = function (isDarkMode, override) {
     return prebuilt;
 };
 
-var initialState = {
-    atomicLightStyle: LIGHT_STYLE,
-    atomicDarkStyle: DARK_STYLE,
-    overrideAtomicRules: {},
-    dark: false,
-};
-var useGlobalState = l(initialState).useGlobalState;
+const s=(e,t)=>{if(!e.includes(t))throw new Error(`'${t}' not found. It must be provided in initialState as a property key.`)},c="production"!==process.env.NODE_ENV?Symbol("UPDATE_STATE"):Symbol(),a=(a,l)=>{const u=Object.keys(l);let i=l,d=null;const p={};u.forEach(e=>{p[e]=new Set;});const E=(e,t)=>t.type===c?t.r?t.r(e):t.e:a(e,t),f=(e,t)=>{"production"!==process.env.NODE_ENV&&s(u,e);const r=r=>{return {...r,[e]:(o=r[e],n=t,"function"==typeof n?n(o):n)};var o,n;};if(d)d({type:c,r});else {i=r(i);const t=i[e];p[e].forEach(e=>e(t));}},S=(e,t)=>{u.forEach(r=>{const o=t[r];e[r]!==o&&p[r].forEach(e=>e(o));});};return {useGlobalStateProvider:()=>{const[o,n]=react.useReducer(E,i);react.useEffect(()=>{if(d)throw new Error("Only one global state provider is allowed");return d=n,n({type:c,e:i}),()=>{d=null;}},[]);const s=react.useRef(o);S(s.current,o),s.current=o,react.useEffect(()=>{i=o;},[o]);},useGlobalState:e=>{"production"!==process.env.NODE_ENV&&s(u,e);const[r,c]=react.useState(i[e]);return react.useEffect(()=>(p[e].add(c),c(i[e]),()=>{p[e].delete(c);}),[e]),[r,react.useCallback(t=>f(e,t),[e])]},getGlobalState:e=>("production"!==process.env.NODE_ENV&&s(u,e),i[e]),setGlobalState:f,getState:()=>i,setState:e=>{if(d)d({type:c,e});else {const t=i;i=e,S(t,i);}},dispatch:e=>{if(d)d(e);else {const t=i;i=a(i,e),S(t,i);}return e}}},l=e=>a((e,t)=>e,e);
+
+var useGlobalState = l(INITIAL_STATES).useGlobalState;
 /**
  * Override current app style
  * @param style New style for app
@@ -631,11 +630,11 @@ var useGlobalState = l(initialState).useGlobalState;
 var useOverrideStyle = function (style, isLightStyle) {
     if (isLightStyle === void 0) { isLightStyle = true; }
     if (isLightStyle) {
-        var _a = useGlobalState("atomicLightStyle"), setStyle = _a[1];
+        var _a = useGlobalState(GLOBAL_LIGHT_STYLE_KEY), setStyle = _a[1];
         setStyle(__assign(__assign({}, LIGHT_STYLE), style));
     }
     else {
-        var _b = useGlobalState("atomicDarkStyle"), setStyle = _b[1];
+        var _b = useGlobalState(GLOBAL_DARK_STYLE_KEY), setStyle = _b[1];
         setStyle(__assign(__assign({}, DARK_STYLE), style));
     }
 };
@@ -654,23 +653,23 @@ var useOverrideStyle = function (style, isLightStyle) {
  */
 var useOverrideRules = function (rules) {
     if (rules === void 0) { rules = {}; }
-    var _a = useGlobalState("overrideAtomicRules"), setRules = _a[1];
+    var _a = useGlobalState(GLOBAL_STYLE_RULE_KEY), setRules = _a[1];
     setRules(rules || []);
 };
 /**
  * Return current dark mode status and set function
  */
 var useDarkMode = function () {
-    var _a = useGlobalState("dark"), isDarkMode = _a[0], setDarkMode = _a[1];
+    var _a = useGlobalState(GLOBAL_DARKMODE_STATE), isDarkMode = _a[0], setDarkMode = _a[1];
     return { isDarkMode: isDarkMode, setDarkMode: setDarkMode };
 };
 /**
  * Get style base on current phone dark mode status
  */
 var useDynamicStyle = function () {
-    var isDarkMode = useGlobalState("dark")[0];
-    var lightTheme = useGlobalState("atomicLightStyle")[0];
-    var darkTheme = useGlobalState("atomicDarkStyle")[0];
+    var isDarkMode = useGlobalState(GLOBAL_DARKMODE_STATE)[0];
+    var lightTheme = useGlobalState(GLOBAL_LIGHT_STYLE_KEY)[0];
+    var darkTheme = useGlobalState(GLOBAL_DARK_STYLE_KEY)[0];
     var _a = react.useState(isDarkMode ? darkTheme : lightTheme), style = _a[0], setStyle = _a[1];
     react.useEffect(function () {
         setStyle(isDarkMode ? darkTheme : lightTheme);
@@ -683,7 +682,7 @@ var useDynamicStyle = function () {
 var useStyleBuilder = function () {
     var style = useDynamicStyle()[0];
     var _a = useDarkMode(), isDarkMode = _a.isDarkMode, setDarkMode = _a.setDarkMode;
-    var overrideRules = useGlobalState("overrideAtomicRules")[0];
+    var overrideRules = useGlobalState(GLOBAL_STYLE_RULE_KEY)[0];
     return { s: s$1(isDarkMode, overrideRules), style: style, isDarkMode: isDarkMode, setDarkMode: setDarkMode };
 };
 
