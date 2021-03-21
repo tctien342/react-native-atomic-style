@@ -4,7 +4,7 @@ Make your react style more easier
 
 #### Support hooks
 
-- useOverrideStyle(style)
+- useOverrideBuilder()
 - useDarkMode() => {isDarkMode, setDarkMode}
 - useDynamicStyle => [currentStyle, isDarkMode]
 - useStyleBuilder => { `` ts /** * Convert tachyons syntax string to react native style * @param styleString String of multi prefix tachyons syntax * @example * // Note: `vw` and `vh` or anything relate to view size will calculated as percent of phone's screen * s(`vw-100 vh-100`) as {height: vh(100), width: vw(100)} * s(`w-100 h-100`) as {height: 100, width: 100} * s(`w-100% h-100%`) as {height: '100%', width: '100%'} * s(`bg`) as {background: style.COLOR.BACKGROUND_HARD} * s(`red`) as {color: style.COLOR.RED} * s(`relative`) as {position: 'relative'} * s(`f1 prime bold`) as {fontSize: style.FONT.SIZE.xl, color: style.COLORS.PRIME, fontWeight: style.FONT.WEIGHT.bold} */ s:(str) /** * Current style of app */ style: IAppStyles; /** * Current dark mode status */ isDarkMode: boolean; /** * Set dark mode status */ setDarkMode: (u: React.SetStateAction<boolean>) => void;  `` }
@@ -57,7 +57,7 @@ s('w-10% w-20%-sm');
 
 ### Default config
 
-> You can override style by using `useOverrideStyle` hook
+> You can override style by using `useOverrideBuilder` hook and use `overrideStyle`
 
 ```ts
 const LIGHT_STYLE: IAppStyles = {
@@ -118,7 +118,7 @@ const DARK_STYLE: IAppStyles = {
 
 ### Support command
 
-> You can override using `useOverrideRules` hook
+> You can override using `useOverrideBuilder` hook and use `overrideRules`
 
 | Command | About | Note |
 | :-- | :-- | :-- | --- |
@@ -168,17 +168,17 @@ const DARK_STYLE: IAppStyles = {
 | bdash | borderStyle dashed |  |
 | bw-{size} | borderWidth size | size can be `10%` for percent or `10` for pixel |
 | br-{size} | borderRadius size, default as \${Input Radius} | size can be `10%` for percent or `10` for pixel | percent or `10` for pixel |
-| br--pill | borderRadius \${pill radius} |  |
-| br--bottom | borderRadius only bottom |  |
-| br--top | borderRadius only top |  |
-| br--left | borderRadius only left |  |
-| br--right | borderRadius only right |  |
+| brPill | borderRadius \${pill radius} |  |
+| brBottom | borderRadius only bottom |  |
+| brTop | borderRadius only top |  |
+| brLeft | borderRadius only left |  |
+| brRight | borderRadius only right |  |
 | <b>Utils properties |  |
-| ci | center all items in view |  |
-| jc | justifyContent center |  |
-| ic | alignItems center |  |
-| row | flexDirection: row |  |
-| column | flexDirection: column |  |
+| centerItems | center all items in view |  |
+| justifyCenter | justifyContent center |  |
+| itemsCenter | alignItems center |  |
+| flexRow | flexDirection: row |  |
+| flexColumn | flexDirection: column |  |
 | shadow-${depth}-${color} | Drop shadow to view | depth as number default 3, color default #000, depth and color only work on ios |
 | <b>Color properties |  |
 | o-{alpha} | opacity: alpha size | alpha size from 0-100 as percent |
