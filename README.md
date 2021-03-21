@@ -67,7 +67,7 @@ Make your react style more easier
 ```
 
 #### Support breaks point
-> Your change override or add breakpoint by use `useOverrideBuilder` and pick `overrideBreakpoint`
+> Your override or add breakpoint by use `useOverrideBuilder` and pick `overrideBreakpoint`
 
 ```ts
 const breakpoint = {
