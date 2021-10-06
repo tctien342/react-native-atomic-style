@@ -31,10 +31,14 @@ var __assign = function() {
     return __assign.apply(this, arguments);
 };
 
-function __spreadArray(to, from) {
-    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
-        to[j] = from[i];
-    return to;
+function __spreadArray(to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
 }
 
 var _a$1 = reactNative.Dimensions.get('window'), SCREEN_WIDTH = _a$1.width, SCREEN_HEIGHT = _a$1.height;
@@ -61,7 +65,7 @@ var setSizeConfig = function (config) {
     DEFAULT_SIZE_CONF = __assign(__assign({}, DEFAULT_SIZE_CONF), config);
 };
 
-const s$1=(e,t)=>{if(!e.includes(t))throw new Error(`'${t}' not found. It must be provided in initialState as a property key.`)},c="production"!==process.env.NODE_ENV?Symbol("UPDATE_STATE"):Symbol(),a=(a,l)=>{const u=Object.keys(l);let i=l,d=null;const p={};u.forEach(e=>{p[e]=new Set;});const E=(e,t)=>t.type===c?t.r?t.r(e):t.e:a(e,t),f=(e,t)=>{"production"!==process.env.NODE_ENV&&s$1(u,e);const r=r=>{return {...r,[e]:(o=r[e],n=t,"function"==typeof n?n(o):n)};var o,n;};if(d)d({type:c,r});else {i=r(i);const t=i[e];p[e].forEach(e=>e(t));}},S=(e,t)=>{u.forEach(r=>{const o=t[r];e[r]!==o&&p[r].forEach(e=>e(o));});};return {useGlobalStateProvider:()=>{const[o,n]=react.useReducer(E,i);react.useEffect(()=>{if(d)throw new Error("Only one global state provider is allowed");return d=n,n({type:c,e:i}),()=>{d=null;}},[]);const s=react.useRef(o);S(s.current,o),s.current=o,react.useEffect(()=>{i=o;},[o]);},useGlobalState:e=>{"production"!==process.env.NODE_ENV&&s$1(u,e);const[r,c]=react.useState(i[e]);return react.useEffect(()=>(p[e].add(c),c(i[e]),()=>{p[e].delete(c);}),[e]),[r,react.useCallback(t=>f(e,t),[e])]},getGlobalState:e=>("production"!==process.env.NODE_ENV&&s$1(u,e),i[e]),setGlobalState:f,getState:()=>i,setState:e=>{if(d)d({type:c,e});else {const t=i;i=e,S(t,i);}},dispatch:e=>{if(d)d(e);else {const t=i;i=a(i,e),S(t,i);}return e}}},l=e=>a((e,t)=>e,e);
+function s$1(){return (s$1=Object.assign||function(t){for(var e=1;e<arguments.length;e++){var r=arguments[e];for(var o in r)Object.prototype.hasOwnProperty.call(r,o)&&(t[o]=r[o]);}return t}).apply(this,arguments)}const c=(t,e)=>{if(!t.includes(e))throw new Error(`'${e}' not found. It must be provided in initialState as a property key.`)},a="production"!==process.env.NODE_ENV?Symbol("UPDATE_STATE"):Symbol(),l=(l,u)=>{const i=Object.keys(u);let p=u,d=null;const f={};i.forEach(t=>{f[t]=new Set;});const E=(t,e)=>e.type===a?e.r?e.r(t):e.e:l(t,e),S=(t,e)=>{"production"!==process.env.NODE_ENV&&c(i,t);const r=r=>{return s$1({},r,{[t]:(o=r[t],n=e,"function"==typeof n?n(o):n)});var o,n;};if(d)d({type:a,r});else {p=r(p);const e=p[t];f[t].forEach(t=>t(e));}},b=(t,e)=>{i.forEach(r=>{const o=e[r];t[r]!==o&&f[r].forEach(t=>t(o));});};return {useGlobalStateProvider:()=>{const[o,n]=react.useReducer(E,p);react.useEffect(()=>{if(d)throw new Error("Only one global state provider is allowed");return d=n,n({type:a,e:p}),()=>{d=null;}},[]);const s=react.useRef(o);b(s.current,o),s.current=o,react.useEffect(()=>{p=o;},[o]);},useGlobalState:t=>{"production"!==process.env.NODE_ENV&&c(i,t);const[r,s]=react.useState(p[t]);return react.useEffect(()=>(f[t].add(s),s(p[t]),()=>{f[t].delete(s);}),[t]),[r,react.useCallback(e=>S(t,e),[t])]},getGlobalState:t=>("production"!==process.env.NODE_ENV&&c(i,t),p[t]),setGlobalState:S,getState:()=>p,setState:t=>{if(d)d({type:a,e:t});else {const e=p;p=t,b(e,p);}},dispatch:t=>{if(d)d(t);else {const e=p;p=l(p,t),b(e,p);}return t}}},u=t=>l((t,e)=>t,t);
 
 /**
  * Resize an size base on scale value
@@ -157,7 +161,7 @@ var INITIAL_STATES = (_a = {},
     _a[GLOBAL_STYLE_RULE_KEY] = {},
     _a[GLOBAL_DARKMODE_STATE] = false,
     _a);
-var _b = l(INITIAL_STATES), useGlobalState = _b.useGlobalState;
+var _b = u(INITIAL_STATES), useGlobalState = _b.useGlobalState; _b.getGlobalState; _b.setGlobalState;
 
 var DEFAULT_BREAK_POINT = {
     i: function () { return reactNative.Platform.OS !== 'ios'; },
@@ -527,7 +531,7 @@ var getStyle = function (dark, prefix, commands, overrideBuilder) {
     var _a, _b;
     if (commands === void 0) { commands = []; }
     if (overrideBuilder === void 0) { overrideBuilder = {}; }
-    var out = (_b = (_a = (dark ? __assign(__assign({}, darkStyleBuilder), overrideBuilder) : __assign(__assign({}, lightStyleBuilder), overrideBuilder)))[prefix]) === null || _b === void 0 ? void 0 : _b.call.apply(_b, __spreadArray([_a], commands));
+    var out = (_b = (_a = (dark ? __assign(__assign({}, darkStyleBuilder), overrideBuilder) : __assign(__assign({}, lightStyleBuilder), overrideBuilder)))[prefix]) === null || _b === void 0 ? void 0 : _b.call.apply(_b, __spreadArray([_a], commands, false));
     if (out) {
         return out;
     }
@@ -616,7 +620,7 @@ var s = function (isDarkMode, breakpoints, overrideStyle) {
             if (out) {
                 var outKeys = Object.keys(out);
                 if (styles[outKeys[0]] && Array.isArray(out[outKeys[0]])) {
-                    styles = __assign(__assign({}, styles), (_a = {}, _a[outKeys[0]] = __spreadArray(__spreadArray([], out[outKeys[0]]), styles[outKeys[0]]), _a));
+                    styles = __assign(__assign({}, styles), (_a = {}, _a[outKeys[0]] = __spreadArray(__spreadArray([], out[outKeys[0]], true), styles[outKeys[0]], true), _a));
                     continue;
                 }
                 styles = __assign(__assign({}, styles), out);
@@ -711,7 +715,13 @@ var useStyleBuilder = function () {
     var _a = useDarkMode(), isDarkMode = _a.isDarkMode, setDarkMode = _a.setDarkMode;
     var overrideRules = useGlobalState(GLOBAL_STYLE_RULE_KEY)[0];
     var breakpoints = useGlobalState(GLOBAL_BREAKPOINT_KEY)[0];
-    return { s: s(isDarkMode, breakpoints, overrideRules), style: style, isDarkMode: isDarkMode, setDarkMode: setDarkMode };
+    /**
+     * Style builder with callback cache
+     */
+    var builder = react.useCallback(function (query) {
+        return s(isDarkMode, breakpoints, overrideRules)(query);
+    }, [isDarkMode, breakpoints, overrideRules]);
+    return { s: builder, style: style, isDarkMode: isDarkMode, setDarkMode: setDarkMode };
 };
 
 exports.setSizeConfig = setSizeConfig;

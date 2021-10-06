@@ -7,7 +7,7 @@ import {
   useGlobalState,
 } from '@constants/state';
 import { s } from '@styles/index';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { StyleProp, TextStyle, ViewStyle } from 'react-native';
 
 const useOverrideBuilder = () => {
@@ -122,7 +122,18 @@ const useStyleBuilder = (): {
   const { isDarkMode, setDarkMode } = useDarkMode();
   const [overrideRules] = useGlobalState(GLOBAL_STYLE_RULE_KEY);
   const [breakpoints] = useGlobalState(GLOBAL_BREAKPOINT_KEY);
-  return { s: s(isDarkMode, breakpoints, overrideRules), style, isDarkMode, setDarkMode };
+
+  /**
+   * Style builder with callback cache
+   */
+  const builder = useCallback(
+    (query: string) => {
+      return s(isDarkMode, breakpoints, overrideRules)(query);
+    },
+    [isDarkMode, breakpoints, overrideRules],
+  );
+
+  return { s: builder, style, isDarkMode, setDarkMode };
 };
 
 export { useDarkMode, useDynamicStyle, useOverrideBuilder, useStyleBuilder };
