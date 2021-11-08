@@ -1,15 +1,25 @@
 import { Platform } from 'react-native';
 
 import { SCREEN_TYPE } from './size';
+import { getGlobalState } from './state';
 
-const DEFAULT_BREAK_POINT = {
-  i: () => Platform.OS !== 'ios',
-  a: () => Platform.OS !== 'android',
-  l: (dark: boolean) => dark,
-  d: (dark: boolean) => !dark,
-  pad: () => SCREEN_TYPE !== 'pad',
-  lg: () => SCREEN_TYPE !== 'lg',
-  sm: () => SCREEN_TYPE !== 'sm',
+/**
+ * Break point for device prefix in build string
+ */
+const DEVICE_BREAK_POINT: { [key: string]: boolean } = {
+  i: Platform.OS === 'ios',
+  a: Platform.OS !== 'android',
+  l: (() => {
+    const mode = getGlobalState('THEME_MODE');
+    return mode === 'light';
+  })(),
+  d: (() => {
+    const mode = getGlobalState('THEME_MODE');
+    return mode === 'dark';
+  })(),
+  pad: SCREEN_TYPE === 'pad',
+  lg: SCREEN_TYPE === 'lg',
+  sm: SCREEN_TYPE === 'sm',
 };
 
-export { DEFAULT_BREAK_POINT };
+export { DEVICE_BREAK_POINT };

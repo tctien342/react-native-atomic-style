@@ -1,16 +1,16 @@
 import { selColor } from './color';
 
 export const BorderBuilder: TStringBuilder = (style: IAppStyles) => ({
-  ba: () => ({
+  ba: {
     borderStyle: 'solid',
     borderWidth: 1,
-  }),
-  bdot: () => ({
+  },
+  bdot: {
     borderStyle: 'dotted',
-  }),
-  bdash: () => ({
+  },
+  bdash: {
     borderStyle: 'dashed',
-  }),
+  },
   bw: (width?: number) => ({
     borderWidth: width || 1,
   }),

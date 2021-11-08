@@ -3,5 +3,6 @@
  * @param str String that need to be checked
  */
 const isOnlyDigit = /^\d+$/;
+const isHexColor = /^#(?:[0-9a-fA-F]{3}){1,2}$/;
 
-export { isOnlyDigit };
+export { isHexColor, isOnlyDigit };

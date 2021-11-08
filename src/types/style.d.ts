@@ -1,9 +1,30 @@
-interface IDefaultValue {
+type TDevice = 'sm' | 'lg' | 'pad';
+type TThemeMode = 'dark' | 'light';
+
+interface ISolidSize {
   l1: number;
   l2: number;
   l3: number;
   l4: number;
   l5: number;
+  l6: number;
+  l7: number;
+}
+
+interface IFontSize {
+  f7: number;
+  f6: number;
+  f5: number;
+  f4: number;
+  f3: number;
+  f2: number;
+  f1: number;
+}
+
+interface IFontWeight {
+  thin: string;
+  bold: string;
+  default: string;
 }
 
 /**
@@ -48,30 +69,18 @@ interface IFontStyle {
   /**
    * Font weight
    */
-  WEIGHT: {
-    thin: string;
-    bold: string;
-    default: string;
-  };
+  WEIGHT: IFontWeight;
   /**
    * Sizes of font
    */
-  SIZE: {
-    f7?: number;
-    f6: number;
-    f5: number;
-    f4: number;
-    f3: number;
-    f2: number;
-    f1?: number;
-  };
+  SIZE: IFontSize;
 }
 
 interface IBorderStyle {
   RADIUS: {
     default: number;
     pill: number;
-  } & IDefaultValue;
+  } & ISolidSize;
 }
 
 interface IAppStyles {
@@ -87,9 +96,11 @@ interface IAppStyles {
    * Border radius default in app
    */
   BORDER: IBorderStyle;
+  SOLID: ISolidSize;
 }
 
-type TStringBuilder = (style: IAppStyles) => { [key: string]: (...args) => { [key: string]: any } };
+type TTokenOutput = ((...args) => { [key: string]: any }) | { [key: string]: any };
+type TStringBuilder = (style: IAppStyles) => { [key: string]: TTokenOutput };
 
 interface ISizeConfig {
   /**
