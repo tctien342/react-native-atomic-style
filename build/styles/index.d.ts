@@ -1,7 +1,5 @@
 import { StyleProp } from 'react-native';
 export declare const styleBuilders: (style: IAppStyles) => {
-    [x: string]: (...args: any[]) => {
-        [key: string]: any;
-    };
+    [x: string]: TTokenOutput;
 };
-export declare const s: (isDarkMode?: boolean, breakpoints?: {}, overrideStyle?: {}) => (styleString: string) => StyleProp<{}>;
+export declare const creator: (isDarkMode?: boolean) => (styleString: string) => StyleProp<{}>;

@@ -2,7 +2,7 @@
  * Resize an size base on scale value
  * @param size Size that need to be normalize
  */
-declare const reScale: (size: number, scale?: number) => number;
+declare const reScale: (size: number, overrideScale?: number | undefined) => number;
 /**
  * Return width base on phone screen
  * @param percent 0-100 percent of view width

@@ -6,9 +6,12 @@ import { getGlobalState } from './state';
 /**
  * Break point for device prefix in build string
  */
-const DEVICE_BREAK_POINT: { [key: string]: boolean } = {
+const DEVICE_BREAK_POINT: TBreakpoint = {
   i: Platform.OS === 'ios',
-  a: Platform.OS !== 'android',
+  a: Platform.OS === 'android',
+  web: Platform.OS === 'web',
+  win: Platform.OS === 'windows',
+  mac: Platform.OS === 'macos',
   l: (() => {
     const mode = getGlobalState('THEME_MODE');
     return mode === 'light';

@@ -3,4 +3,5 @@
  * @param str String that need to be checked
  */
 declare const isOnlyDigit: RegExp;
-export { isOnlyDigit };
+declare const isHexColor: RegExp;
+export { isHexColor, isOnlyDigit };

@@ -33,6 +33,7 @@ const LIB_DEFAULT: {
   COLORS_DARK: IColorStyle;
   LIGHT_FONT_WEIGHT: IFontWeight;
   DARK_FONT_WEIGHT: IFontWeight;
+  EXTRA_BREAKPOINT: {};
 } = {
   EARLY_DEVICE_RATIO_POINT: 1.8,
   THEME_MODE: 'light',
@@ -90,6 +91,7 @@ const LIB_DEFAULT: {
   },
   LIGHT_FONT_WEIGHT: { thin: '200', bold: 'bold', default: 'normal' },
   DARK_FONT_WEIGHT: { thin: '300', bold: 'bold', default: 'normal' },
+  EXTRA_BREAKPOINT: {},
 };
 
 export { LIB_DEFAULT };

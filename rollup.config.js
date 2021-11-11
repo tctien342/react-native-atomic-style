@@ -46,6 +46,7 @@ export default {
       include: ['node_modules/**'],
       namedExports: {
         'node_modules/react/react.js': ['Children', 'Component', 'PropTypes', 'createElement'],
+        'node_modules/lodash/lodash.js': ['merge', 'reduce'],
       },
     }),
     progress(),

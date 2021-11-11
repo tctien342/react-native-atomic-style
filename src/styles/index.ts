@@ -1,6 +1,7 @@
-import { DEFAULT_BREAK_POINT } from '@constants/breakpoint';
+import { DEVICE_BREAK_POINT } from '@constants/breakpoint';
+import { getGlobalState } from '@constants/state';
 import { DARK_STYLE, LIGHT_STYLE } from '@constants/style';
-import { isOnlyDigit } from '@utils/regex';
+import { merge } from 'lodash';
 import { StyleProp } from 'react-native';
 
 import { BorderBuilder } from './border';
@@ -19,8 +20,10 @@ export const styleBuilders = (style: IAppStyles) => ({
   ...ColorBuilder(style),
 });
 
-const lightStyleBuilder = styleBuilders(LIGHT_STYLE);
-const darkStyleBuilder = styleBuilders(DARK_STYLE);
+const LIGHT_BUILDER = styleBuilders(LIGHT_STYLE);
+const DARK_BUILDER = styleBuilders(DARK_STYLE);
+const BREAK_POINT = { ...DEVICE_BREAK_POINT, ...getGlobalState('EXTRA_BREAKPOINT') };
+const BREAK_KEYS = Object.keys(BREAK_POINT);
 
 /**
  * Cached builded styles for not build it each time call again with same build string
@@ -32,32 +35,38 @@ const cacheBuilder: {
   };
 } = {};
 
-const getStyle = (dark: boolean, prefix: string, commands: (string | number)[] = [], overrideBuilder = {}) => {
-  const out = (dark ? { ...darkStyleBuilder, ...overrideBuilder } : { ...lightStyleBuilder, ...overrideBuilder })[
-    prefix
-  ]?.(...commands);
-  if (out) {
-    return out;
+const getStyle = (dark: boolean, token: string): { [key: string]: string | number } => {
+  let output = {};
+  const tokenParts = token.split('-');
+  const tokenPrefix = tokenParts.shift();
+  const deviceBreakpoint = tokenParts.at(-1);
+  if (deviceBreakpoint && BREAK_KEYS.includes(deviceBreakpoint)) {
+    if (!BREAK_POINT[deviceBreakpoint]) return output;
   }
-  return false;
-};
-
-/**
- * Check if string builder have break point
- * @param commands array of builder string
- * @param args extras variable to passthrough
- */
-const checkBreakPoint = (commands: string[], breakpoints = {}, ...args) => {
-  const bkps = { ...DEFAULT_BREAK_POINT, ...breakpoints };
-  for (const token of commands) {
-    if (bkps[token]) {
-      return bkps[token](...args);
+  const builder = dark ? DARK_BUILDER : LIGHT_BUILDER;
+  if (builder[token]) {
+    /**
+     * If token is passthroght
+     */
+    const out = builder[token];
+    if (typeof out !== 'function') {
+      output = out;
+    }
+  } else {
+    /**
+     * Parsing token into multi part
+     */
+    if (tokenPrefix && builder[tokenPrefix]) {
+      const buildCmd = builder[tokenPrefix];
+      if (typeof buildCmd === 'function') {
+        output = buildCmd(...tokenParts);
+      }
     }
   }
-  return false;
+  return output;
 };
 
-export const s = (isDarkMode = false, breakpoints = {}, overrideStyle = {}) => {
+export const creator = (isDarkMode = false) => {
   const dark = isDarkMode ? 'dark' : 'light';
   /**
    * Convert tachyons syntax string to react native style
@@ -80,52 +89,11 @@ export const s = (isDarkMode = false, breakpoints = {}, overrideStyle = {}) => {
     // Compute string to style object
     let styles: { [key: string]: any } = {};
     const parts = styleString.split(' ');
+
     for (const part of parts) {
-      let out: false | { [key: string]: any } = false;
-      let commands = part.split('-');
-      if (checkBreakPoint(commands, breakpoints, isDarkMode)) {
-        continue;
-      }
-      commands = commands.filter((val) => !Object.keys(breakpoints).includes(val));
-      switch (commands.length) {
-        case 1: {
-          out = getStyle(isDarkMode, part, undefined, overrideStyle);
-          break;
-        }
-        case 2: {
-          out = getStyle(
-            isDarkMode,
-            commands[0],
-            [isOnlyDigit.test(commands[1]) || commands[1].includes('.') ? parseInt(commands[1], 10) : commands[1]],
-            overrideStyle,
-          );
-          break;
-        }
-        case 3: {
-          const prefix = commands.shift();
-          if (prefix) {
-            if (commands[0]) {
-              out = getStyle(isDarkMode, prefix, commands, overrideStyle);
-              break;
-            }
-            if (isOnlyDigit.test(commands[1]) || commands[1].includes('.')) {
-              out = getStyle(isDarkMode, prefix, [parseInt(commands[1], 10) * -1], overrideStyle);
-              break;
-            }
-          }
-          out = getStyle(isDarkMode, part, undefined, overrideStyle);
-        }
-      }
+      const out = getStyle(isDarkMode, part);
       if (out) {
-        const outKeys = Object.keys(out);
-        if (styles[outKeys[0]] && Array.isArray(out[outKeys[0]])) {
-          styles = {
-            ...styles,
-            [outKeys[0]]: [...out[outKeys[0]], ...styles[outKeys[0]]],
-          };
-          continue;
-        }
-        styles = { ...styles, ...out };
+        styles = merge(styles, out);
       }
     }
     if (!cacheBuilder[styleString]) {

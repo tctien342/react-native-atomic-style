@@ -1,29 +1,29 @@
-export const UtilsBuilder: TStringBuilder = (_style: IAppStyles) => ({
-  img: () => ({ maxWidth: '100%' }),
-  absolute: () => ({
+export const UtilsBuilder: TStringBuilder = () => ({
+  img: { maxWidth: '100%' },
+  absolute: {
     position: 'absolute',
-  }),
-  relative: () => ({
+  },
+  relative: {
     position: 'relative',
-  }),
-  centerItems: () => ({
+  },
+  'center-items': {
     justifyContent: 'center',
     alignItems: 'center',
-  }),
-  justifyCenter: () => ({ justifyContent: 'center' }),
-  justifyStart: () => ({ justifyContent: 'flex-start' }),
-  justifyEnd: () => ({ justifyContent: 'flex-end' }),
-  itemsCenter: () => ({ alignItems: 'center' }),
-  itemsStart: () => ({ alignItems: 'flex-start' }),
-  itemsEnd: () => ({ alignItems: 'flex-end' }),
-  flexWrap: () => ({ flexWrap: 'wrap' }),
-  flexNoWrap: () => ({ flexWrap: 'nowrap' }),
-  flexRow: () => ({
+  },
+  'justify-center': { justifyContent: 'center' },
+  'justify-start': { justifyContent: 'flex-start' },
+  'justify-end': { justifyContent: 'flex-end' },
+  'items-center': { alignItems: 'center' },
+  'items-start': { alignItems: 'flex-start' },
+  'items-end': { alignItems: 'flex-end' },
+  'flex-wrap': { flexWrap: 'wrap' },
+  'flex-nowrap': { flexWrap: 'nowrap' },
+  'flex-row': {
     flexDirection: 'row',
-  }),
-  flexCol: () => ({
+  },
+  'flex-column': {
     flexDirection: 'column',
-  }),
+  },
   shadow: (depth = 4, color = '#000') => ({
     shadowColor: color,
     shadowOffset: {
@@ -34,15 +34,15 @@ export const UtilsBuilder: TStringBuilder = (_style: IAppStyles) => ({
     shadowRadius: depth,
     elevation: 4,
   }),
-  df: () => ({ display: 'flex' }),
-  dn: () => ({ display: 'none' }),
+  df: { display: 'flex' },
+  dn: { display: 'none' },
   rotate: (value = '0deg') => ({
     transform: [{ rotate: `${value}deg` }],
   }),
   scale: (value = 1) => ({
     transform: [{ scale: value }],
   }),
-  ofVisible: () => ({ overflow: 'visible' }),
-  ofHidden: () => ({ overflow: 'hidden' }),
-  ofScroll: () => ({ overflow: 'scroll' }),
+  'overflow-visible': { overflow: 'visible' },
+  'overflow-hidden': { overflow: 'hidden' },
+  'overflow-scroll': { overflow: 'scroll' },
 });

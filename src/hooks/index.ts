@@ -1,89 +1,27 @@
-import {
-  GLOBAL_BREAKPOINT_KEY,
-  GLOBAL_DARK_STYLE_KEY,
-  GLOBAL_DARKMODE_STATE,
-  GLOBAL_LIGHT_STYLE_KEY,
-  GLOBAL_STYLE_RULE_KEY,
-  useGlobalState,
-} from '@constants/state';
-import { s } from '@styles/index';
+import { useGlobalState } from '@constants/state';
+import { DARK_STYLE, LIGHT_STYLE } from '@constants/style';
+import { creator } from '@styles/index';
 import { useCallback, useEffect, useState } from 'react';
-import { StyleProp, TextStyle, ViewStyle } from 'react-native';
-
-const useOverrideBuilder = () => {
-  const [crrRule, setRules] = useGlobalState(GLOBAL_STYLE_RULE_KEY);
-  const [crrLight, setLightStyle] = useGlobalState(GLOBAL_LIGHT_STYLE_KEY);
-  const [crrDark, setDarkStyle] = useGlobalState(GLOBAL_DARK_STYLE_KEY);
-  const [crrBreaks, setBreakPoint] = useGlobalState(GLOBAL_BREAKPOINT_KEY);
-
-  /**
-   * Define your custom build rules
-   * @param rules Your custom rules
-   * ## Example
-   * ```js
-   * { "wh": (arg1, arg2) => ({width: arg1, height: arg2}) }
-   * ```
-   * `wh-10-22` will be { width: 10, height: 22 }
-   * ```js
-   * { "pa--l1": () => ({ padding: $l1 }) }
-   * ```
-   * `pa--btn` will be { padding: $l1 }
-   */
-  const overrideRules = (newRule: { [key: string]: (...arg) => StyleProp<ViewStyle> | StyleProp<TextStyle> }) => {
-    setRules({ ...crrRule, ...newRule });
-  };
-
-  /**
-   * Override current app style
-   * @param style New style for app
-   * @param isLightStyle True for set light theme
-   */
-  const overrideStyle = (style: Partial<IAppStyles>, isLightStyle = true) => {
-    if (isLightStyle) {
-      setLightStyle({ ...crrLight, ...style });
-    } else {
-      setDarkStyle({ ...crrDark, ...style });
-    }
-  };
-
-  /**
-   * Add new breakpoint into builder
-   * ```js
-   * {
-   * i: () => Platform.OS !== 'ios'
-   * a: () => Platform.OS !== 'android'
-   * }
-   * ```
-   * => `w-10-i` will only in `ios`
-   * and `w-10-a` will only in `android`
-   * @param breakpoints New breakpoint to be declare
-   */
-  const overrideBreakpoint = (breakpoints: { [key: string]: (dark?: boolean) => boolean }) => {
-    setBreakPoint({ ...crrBreaks, ...breakpoints });
-  };
-
-  return { overrideRules, overrideStyle, overrideBreakpoint };
-};
 
 /**
  * Return current dark mode status and set function
  */
 const useDarkMode = () => {
-  const [isDarkMode, setDarkMode] = useGlobalState(GLOBAL_DARKMODE_STATE);
-  return { isDarkMode, setDarkMode };
+  const [mode, setMode] = useGlobalState('THEME_MODE');
+  return { isDarkMode: mode === 'dark', setDarkMode: (isDark: boolean) => setMode(isDark ? 'dark' : 'light') };
 };
 
 /**
  * Get style base on current phone dark mode status
  */
 const useDynamicStyle = (): [IAppStyles, boolean] => {
-  const [isDarkMode] = useGlobalState(GLOBAL_DARKMODE_STATE);
-  const [lightTheme] = useGlobalState(GLOBAL_LIGHT_STYLE_KEY);
-  const [darkTheme] = useGlobalState(GLOBAL_DARK_STYLE_KEY);
-  const [style, setStyle] = useState<IAppStyles>(isDarkMode ? darkTheme : lightTheme);
+  const { isDarkMode } = useDarkMode();
+  const [style, setStyle] = useState<IAppStyles>(isDarkMode ? DARK_STYLE : LIGHT_STYLE);
+
   useEffect(() => {
-    setStyle(isDarkMode ? darkTheme : lightTheme);
+    setStyle(isDarkMode ? DARK_STYLE : LIGHT_STYLE);
   }, [isDarkMode]);
+
   return [style, isDarkMode];
 };
 
@@ -120,20 +58,18 @@ const useStyleBuilder = (): {
 } => {
   const [style] = useDynamicStyle();
   const { isDarkMode, setDarkMode } = useDarkMode();
-  const [overrideRules] = useGlobalState(GLOBAL_STYLE_RULE_KEY);
-  const [breakpoints] = useGlobalState(GLOBAL_BREAKPOINT_KEY);
 
   /**
    * Style builder with callback cache
    */
   const builder = useCallback(
     (query: string) => {
-      return s(isDarkMode, breakpoints, overrideRules)(query);
+      return creator(isDarkMode)(query);
     },
-    [isDarkMode, breakpoints, overrideRules],
+    [isDarkMode],
   );
 
   return { s: builder, style, isDarkMode, setDarkMode };
 };
 
-export { useDarkMode, useDynamicStyle, useOverrideBuilder, useStyleBuilder };
+export { useDarkMode, useDynamicStyle, useStyleBuilder };
