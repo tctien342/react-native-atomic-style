@@ -11,17 +11,19 @@ import { SizeBuilder } from './size';
 import { TextBuilder } from './text';
 import { UtilsBuilder } from './utils';
 
-export const styleBuilders = (style: IAppStyles) => ({
+export const styleBuilders = (style: IAppStyles, isDark: boolean) => ({
   ...BorderBuilder(style),
   ...PositionBuilder(style),
   ...TextBuilder(style),
   ...SizeBuilder(style),
-  ...UtilsBuilder(style),
+  ...UtilsBuilder(),
   ...ColorBuilder(style),
+  ...getGlobalState('EXTRA_BUILDER')(style, isDark),
 });
 
-const LIGHT_BUILDER = styleBuilders(LIGHT_STYLE);
-const DARK_BUILDER = styleBuilders(DARK_STYLE);
+const LIGHT_BUILDER = styleBuilders(LIGHT_STYLE, false);
+const DARK_BUILDER = styleBuilders(DARK_STYLE, true);
+export const BUILDER_PACK = { LIGHT: LIGHT_BUILDER, DARK: DARK_BUILDER };
 const BREAK_POINT = { ...DEVICE_BREAK_POINT, ...getGlobalState('EXTRA_BREAKPOINT') };
 const BREAK_KEYS = Object.keys(BREAK_POINT);
 
@@ -35,7 +37,7 @@ const cacheBuilder: {
   };
 } = {};
 
-const getStyle = (dark: boolean, token: string): { [key: string]: string | number } => {
+const getStyle = (dark: boolean, token: string, builderPack = BUILDER_PACK): { [key: string]: string | number } => {
   let output = {};
   const tokenParts = token.split('-');
   const tokenPrefix = tokenParts.shift();
@@ -43,7 +45,7 @@ const getStyle = (dark: boolean, token: string): { [key: string]: string | numbe
   if (deviceBreakpoint && BREAK_KEYS.includes(deviceBreakpoint)) {
     if (!BREAK_POINT[deviceBreakpoint]) return output;
   }
-  const builder = dark ? DARK_BUILDER : LIGHT_BUILDER;
+  const builder = dark ? builderPack.DARK : builderPack.LIGHT;
   if (builder[token]) {
     /**
      * If token is passthroght
@@ -66,7 +68,7 @@ const getStyle = (dark: boolean, token: string): { [key: string]: string | numbe
   return output;
 };
 
-export const creator = (isDarkMode = false) => {
+export const creator = (isDarkMode = false, builderPack = BUILDER_PACK) => {
   const dark = isDarkMode ? 'dark' : 'light';
   /**
    * Convert tachyons syntax string to react native style
@@ -91,7 +93,7 @@ export const creator = (isDarkMode = false) => {
     const parts = styleString.split(' ');
 
     for (const part of parts) {
-      const out = getStyle(isDarkMode, part);
+      const out = getStyle(isDarkMode, part, builderPack);
       if (out) {
         styles = merge(styles, out);
       }

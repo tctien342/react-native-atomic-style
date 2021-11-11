@@ -26,7 +26,7 @@ export const selColor = (style: IAppStyles, select: string, defaultColor: string
   return defaultColor;
 };
 
-export const ColorBuilder: TStringBuilder = (style: IAppStyles) => ({
+export const ColorBuilder = <T = {}>(style: IAppStyles & T) => ({
   white: { color: style.COLORS.WHITE },
   hard: { color: style.COLORS.FONT_HARD },
   light: { color: style.COLORS.FONT_LIGHT },
@@ -40,9 +40,11 @@ export const ColorBuilder: TStringBuilder = (style: IAppStyles) => ({
   o: (value: number) => ({
     opacity: value > 1 ? (value / 100).toFixed(2) : value,
   }),
-  bg: (color) => {
+  bg: (color: keyof typeof style.COLORS) => {
     return {
       backgroundColor: selColor(style, color, style.COLORS.BACKGROUND_HARD),
     };
   },
 });
+
+export type TColorBuilderKey = ReturnType<typeof ColorBuilder>;

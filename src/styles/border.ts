@@ -1,6 +1,6 @@
 import { selColor } from './color';
 
-export const BorderBuilder: TStringBuilder = (style: IAppStyles) => ({
+export const BorderBuilder = (style: IAppStyles) => ({
   ba: {
     borderStyle: 'solid',
     borderWidth: 1,
@@ -19,7 +19,7 @@ export const BorderBuilder: TStringBuilder = (style: IAppStyles) => ({
   br5: { borderRadius: style.SOLID.l5 },
   br6: { borderRadius: style.SOLID.l6 },
   br7: { borderRadius: style.SOLID.l7 },
-  bc: (color: string) => ({
+  bc: (color: keyof typeof style.COLORS) => ({
     borderColor: selColor(style, color, style.COLORS.FONT_HARD),
   }),
   'b--dot': {
@@ -51,3 +51,5 @@ export const BorderBuilder: TStringBuilder = (style: IAppStyles) => ({
     borderTopRightRadius: 0,
   },
 });
+
+export type TBorderBuilderKey = ReturnType<typeof BorderBuilder>;

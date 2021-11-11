@@ -31,9 +31,21 @@ const LIB_DEFAULT: {
    * Color for dark mode
    */
   COLORS_DARK: IColorStyle;
+  /**
+   * Font weight in light mode
+   */
   LIGHT_FONT_WEIGHT: IFontWeight;
+  /**
+   * Font weight in dark mode
+   */
   DARK_FONT_WEIGHT: IFontWeight;
-  EXTRA_BREAKPOINT: {};
+  /**
+   * Addon breakpoint
+   *
+   * Return true if breakpoint pass
+   */
+  EXTRA_BREAKPOINT: TBreakpoint;
+  EXTRA_BUILDER: TStringExtraBuilder;
 } = {
   EARLY_DEVICE_RATIO_POINT: 1.8,
   THEME_MODE: 'light',
@@ -92,6 +104,7 @@ const LIB_DEFAULT: {
   LIGHT_FONT_WEIGHT: { thin: '200', bold: 'bold', default: 'normal' },
   DARK_FONT_WEIGHT: { thin: '300', bold: 'bold', default: 'normal' },
   EXTRA_BREAKPOINT: {},
+  EXTRA_BUILDER: () => ({}),
 };
 
 export { LIB_DEFAULT };

@@ -101,6 +101,7 @@ interface IAppStyles {
 
 type TTokenOutput = ((...args) => { [key: string]: any }) | { [key: string]: any };
 type TStringBuilder = (style: IAppStyles) => { [key: string]: TTokenOutput };
+type TStringExtraBuilder = (style: IAppStyles, isDark: boolean) => { [key: string]: TTokenOutput };
 type TBreakpoint = { [key: string]: boolean };
 
 interface ISizeConfig {

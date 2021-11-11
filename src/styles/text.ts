@@ -1,6 +1,6 @@
 import { reScale } from '@utils/style';
 
-export const TextBuilder: TStringBuilder = (style: IAppStyles) => ({
+export const TextBuilder = (style: IAppStyles) => ({
   tc: {
     textAlign: 'center',
   },
@@ -44,3 +44,5 @@ export const TextBuilder: TStringBuilder = (style: IAppStyles) => ({
     fontWeight: style.FONT.WEIGHT.bold,
   },
 });
+
+export type TTextBuilderKey = ReturnType<typeof TextBuilder>;

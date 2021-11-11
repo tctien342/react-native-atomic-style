@@ -1,6 +1,6 @@
 import { LIB_DEFAULT } from '@constants/default';
 
-export const PositionBuilder: TStringBuilder = (style: IAppStyles) => ({
+export const PositionBuilder = (style: IAppStyles) => ({
   top: (offset: number | string = 0) => ({
     top: offset,
   }),
@@ -146,3 +146,5 @@ export const PositionBuilder: TStringBuilder = (style: IAppStyles) => ({
   ml6: { marginLeft: style.SOLID.l6 },
   ml7: { marginLeft: style.SOLID.l7 },
 });
+
+export type TPositionBuilderKey = ReturnType<typeof PositionBuilder>;

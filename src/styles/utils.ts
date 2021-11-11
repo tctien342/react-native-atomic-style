@@ -1,4 +1,4 @@
-export const UtilsBuilder: TStringBuilder = () => ({
+export const UtilsBuilder = () => ({
   img: { maxWidth: '100%' },
   absolute: {
     position: 'absolute',
@@ -46,3 +46,5 @@ export const UtilsBuilder: TStringBuilder = () => ({
   'overflow-hidden': { overflow: 'hidden' },
   'overflow-scroll': { overflow: 'scroll' },
 });
+
+export type TUtilsBuilderKey = ReturnType<typeof UtilsBuilder>;

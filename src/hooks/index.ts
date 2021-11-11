@@ -1,6 +1,7 @@
 import { useGlobalState } from '@constants/state';
 import { DARK_STYLE, LIGHT_STYLE } from '@constants/style';
-import { creator } from '@styles/index';
+import { BUILDER_PACK, creator, styleBuilders } from '@styles/index';
+import { merge } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 
 /**
@@ -44,6 +45,12 @@ const useStyleBuilder = (): {
    */
   s: (styleString: string) => {} | null | undefined;
   /**
+   * Use as normal function with typped
+   * @example
+   * style([f.bold, f.white, f.bg("white")])
+   */
+  f: ReturnType<typeof styleBuilders>;
+  /**
    * Current style of app
    */
   style: IAppStyles;
@@ -58,6 +65,7 @@ const useStyleBuilder = (): {
 } => {
   const [style] = useDynamicStyle();
   const { isDarkMode, setDarkMode } = useDarkMode();
+  const currentCompiler = BUILDER_PACK[isDarkMode ? 'LIGHT' : 'DARK'];
 
   /**
    * Style builder with callback cache
@@ -69,7 +77,48 @@ const useStyleBuilder = (): {
     [isDarkMode],
   );
 
-  return { s: builder, style, isDarkMode, setDarkMode };
+  return { s: builder, f: currentCompiler, style, isDarkMode, setDarkMode };
 };
 
-export { useDarkMode, useDynamicStyle, useStyleBuilder };
+/**
+ * Make an custom builder for your app
+ */
+const makeCustomBuilder = <T = {}, S = {}>(config: {
+  /**
+   * Add extra style config for light mode
+   */
+  light?: RecursivePartial<IAppStyles> & T;
+  /**
+   * Add extra style config for dark mode
+   */
+  dark?: RecursivePartial<IAppStyles> & T;
+  /**
+   * Add extra builder
+   */
+  builder?: (style: IAppStyles & T, isDark: boolean) => S;
+}) => {
+  const lightStyle = merge(LIGHT_STYLE, config.light) as any;
+  const darkStyle = merge(DARK_STYLE, config.dark) as any;
+  const compiledStyle = {
+    LIGHT: merge(styleBuilders(lightStyle, false), config.builder?.(lightStyle, false)),
+    DARK: merge(styleBuilders(darkStyle, true), config.builder?.(darkStyle, true)),
+  };
+  const useStyleBuilder = () => {
+    const { isDarkMode, setDarkMode } = useDarkMode();
+    const currentStyle: IAppStyles & T = isDarkMode ? darkStyle : lightStyle;
+    const currentCompiler = compiledStyle[isDarkMode ? 'LIGHT' : 'DARK'] as ReturnType<typeof styleBuilders> & S;
+    /**
+     * Style builder with callback cache
+     */
+    const builder = useCallback(
+      (query: string) => {
+        return creator(isDarkMode, compiledStyle)(query);
+      },
+      [isDarkMode],
+    );
+    return { s: builder, f: currentCompiler, style: currentStyle, isDarkMode, setDarkMode };
+  };
+  return { useStyleBuilder };
+};
+
+export { makeCustomBuilder, useDarkMode, useDynamicStyle, useStyleBuilder };

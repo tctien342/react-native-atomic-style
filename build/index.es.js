@@ -61,6 +61,7 @@ var LIB_DEFAULT = {
     LIGHT_FONT_WEIGHT: { thin: '200', bold: 'bold', default: 'normal' },
     DARK_FONT_WEIGHT: { thin: '300', bold: 'bold', default: 'normal' },
     EXTRA_BREAKPOINT: {},
+    EXTRA_BUILDER: function () { return ({}); },
 };
 
 var INITIAL_STATES = LIB_DEFAULT;
@@ -17395,7 +17396,10 @@ var DARK_STYLE = {
  */
 var DEVICE_BREAK_POINT = {
     i: Platform.OS === 'ios',
-    a: Platform.OS !== 'android',
+    a: Platform.OS === 'android',
+    web: Platform.OS === 'web',
+    win: Platform.OS === 'windows',
+    mac: Platform.OS === 'macos',
     l: (function () {
         var mode = getGlobalState('THEME_MODE');
         return mode === 'light';
@@ -17490,28 +17494,28 @@ var BorderBuilder = function (style) { return ({
     'b--dash': {
         borderStyle: 'dashed',
     },
-    'br-btn': function () { return ({
+    'br-btn': {
         borderRadius: style.BORDER.RADIUS.default,
-    }); },
-    'br-pill': function () { return ({
+    },
+    'br-pill': {
         borderRadius: style.BORDER.RADIUS.pill,
-    }); },
-    'br--bottom': function () { return ({
+    },
+    'br--bottom': {
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
-    }); },
-    'br--top': function () { return ({
+    },
+    'br--top': {
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
-    }); },
-    'br--right': function () { return ({
+    },
+    'br--right': {
         borderTopLeftRadius: 0,
         borderBottomLeftRadius: 0,
-    }); },
-    'br--left': function () { return ({
+    },
+    'br--left': {
         borderBottomRightRadius: 0,
         borderTopRightRadius: 0,
-    }); },
+    },
 }); };
 
 var PositionBuilder = function (style) { return ({
@@ -17943,16 +17947,18 @@ var UtilsBuilder = function () { return ({
     'overflow-scroll': { overflow: 'scroll' },
 }); };
 
-var styleBuilders = function (style) { return (__assign(__assign(__assign(__assign(__assign(__assign({}, BorderBuilder(style)), PositionBuilder(style)), TextBuilder(style)), SizeBuilder(style)), UtilsBuilder()), ColorBuilder(style))); };
-var LIGHT_BUILDER = styleBuilders(LIGHT_STYLE);
-var DARK_BUILDER = styleBuilders(DARK_STYLE);
+var styleBuilders = function (style, isDark) { return (__assign(__assign(__assign(__assign(__assign(__assign(__assign({}, BorderBuilder(style)), PositionBuilder(style)), TextBuilder(style)), SizeBuilder(style)), UtilsBuilder()), ColorBuilder(style)), getGlobalState('EXTRA_BUILDER')(style, isDark))); };
+var LIGHT_BUILDER = styleBuilders(LIGHT_STYLE, false);
+var DARK_BUILDER = styleBuilders(DARK_STYLE, true);
+var BUILDER_PACK = { LIGHT: LIGHT_BUILDER, DARK: DARK_BUILDER };
 var BREAK_POINT = __assign(__assign({}, DEVICE_BREAK_POINT), getGlobalState('EXTRA_BREAKPOINT'));
 var BREAK_KEYS = Object.keys(BREAK_POINT);
 /**
  * Cached builded styles for not build it each time call again with same build string
  */
 var cacheBuilder = {};
-var getStyle = function (dark, token) {
+var getStyle = function (dark, token, builderPack) {
+    if (builderPack === void 0) { builderPack = BUILDER_PACK; }
     var output = {};
     var tokenParts = token.split('-');
     var tokenPrefix = tokenParts.shift();
@@ -17961,7 +17967,7 @@ var getStyle = function (dark, token) {
         if (!BREAK_POINT[deviceBreakpoint])
             return output;
     }
-    var builder = dark ? DARK_BUILDER : LIGHT_BUILDER;
+    var builder = dark ? builderPack.DARK : builderPack.LIGHT;
     if (builder[token]) {
         /**
          * If token is passthroght
@@ -17984,8 +17990,9 @@ var getStyle = function (dark, token) {
     }
     return output;
 };
-var creator = function (isDarkMode) {
+var creator = function (isDarkMode, builderPack) {
     if (isDarkMode === void 0) { isDarkMode = false; }
+    if (builderPack === void 0) { builderPack = BUILDER_PACK; }
     var dark = isDarkMode ? 'dark' : 'light';
     /**
      * Convert tachyons syntax string to react native style
@@ -18011,7 +18018,7 @@ var creator = function (isDarkMode) {
         var parts = styleString.split(' ');
         for (var _i = 0, parts_1 = parts; _i < parts_1.length; _i++) {
             var part = parts_1[_i];
-            var out = getStyle(isDarkMode, part);
+            var out = getStyle(isDarkMode, part, builderPack);
             if (out) {
                 styles = lodash_1(styles, out);
             }
@@ -18049,14 +18056,40 @@ var useDynamicStyle = function () {
 var useStyleBuilder = function () {
     var style = useDynamicStyle()[0];
     var _a = useDarkMode(), isDarkMode = _a.isDarkMode, setDarkMode = _a.setDarkMode;
+    var currentCompiler = BUILDER_PACK[isDarkMode ? 'LIGHT' : 'DARK'];
     /**
      * Style builder with callback cache
      */
     var builder = useCallback(function (query) {
         return creator(isDarkMode)(query);
     }, [isDarkMode]);
-    return { s: builder, style: style, isDarkMode: isDarkMode, setDarkMode: setDarkMode };
+    return { s: builder, f: currentCompiler, style: style, isDarkMode: isDarkMode, setDarkMode: setDarkMode };
+};
+/**
+ * Make an custom builder for your app
+ */
+var makeCustomBuilder = function (config) {
+    var _a, _b;
+    var lightStyle = lodash_1(LIGHT_STYLE, config.light);
+    var darkStyle = lodash_1(DARK_STYLE, config.dark);
+    var compiledStyle = {
+        LIGHT: lodash_1(styleBuilders(lightStyle, false), (_a = config.builder) === null || _a === void 0 ? void 0 : _a.call(config, lightStyle, false)),
+        DARK: lodash_1(styleBuilders(darkStyle, true), (_b = config.builder) === null || _b === void 0 ? void 0 : _b.call(config, darkStyle, true)),
+    };
+    var useStyleBuilder = function () {
+        var _a = useDarkMode(), isDarkMode = _a.isDarkMode, setDarkMode = _a.setDarkMode;
+        var currentStyle = isDarkMode ? darkStyle : lightStyle;
+        var currentCompiler = compiledStyle[isDarkMode ? 'LIGHT' : 'DARK'];
+        /**
+         * Style builder with callback cache
+         */
+        var builder = useCallback(function (query) {
+            return creator(isDarkMode, compiledStyle)(query);
+        }, [isDarkMode]);
+        return { s: builder, f: currentCompiler, style: currentStyle, isDarkMode: isDarkMode, setDarkMode: setDarkMode };
+    };
+    return { useStyleBuilder: useStyleBuilder };
 };
 
-export { useDarkMode, useDynamicStyle, useStyleBuilder };
+export { makeCustomBuilder, useDarkMode, useDynamicStyle, useStyleBuilder };
 //# sourceMappingURL=index.es.js.map
