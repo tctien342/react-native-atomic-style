@@ -2,9 +2,45 @@ import { useGlobalState } from '@constants/state';
 import { DARK_STYLE, LIGHT_STYLE } from '@constants/style';
 import { RecursivePartial } from '@declares/app';
 import { IAppStyles } from '@declares/style';
-import { BREAK_POINT, BUILDER_PACK, creator, styleBuilders } from '@styles/index';
-import { merge } from 'lodash';
+import { BREAK_POINT, BUILDER_PACK, creator, styleBuilders, TBuilderCmd, TBuilderCmdKeys } from '@styles/index';
+import { cloneDeep, merge } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
+import { StyleProp } from 'react-native';
+
+export type TUseStyleBuilder = {
+  /**
+   * Convert tachyons syntax string to react native style
+   * @param styleString String of multi prefix tachyons syntax
+   * @example
+   * // Note: `vw` and `vh` or anything relate to view size will calculated as percent of phone's screen
+   * s(`vw-100 vh-100`) as {height: vh(100), width: vw(100)}
+   * s(`w-100 h-100`, {opacity: 0.1}) as {height: 100, width: 100, opacity: 0.1}
+   * s(`w-100% h-100%`) as {height: '100%', width: '100%'}
+   * s(`bg`) as {background: style.COLOR.BACKGROUND_HARD}
+   * s(`red`) as {color: style.COLOR.RED}
+   * s(`relative`) as {position: 'relative'}
+   * s(`f1 prime bold`) as {fontSize: style.FONT.SIZE.xl, color: style.COLORS.PRIME, fontWeight: style.FONT.WEIGHT.bold}
+   */
+  s: <C = {}>(styleString: string, ...args: StyleProp<C>[]) => StyleProp<C>;
+  /**
+   * Use as normal function with typped
+   * @example
+   * style([f.bold, f.white, f.bg("white")])
+   */
+  f: ReturnType<typeof styleBuilders>;
+  /**
+   * Current style of app
+   */
+  style: IAppStyles;
+  /**
+   * Current dark mode status
+   */
+  isDarkMode: boolean;
+  /**
+   * Set dark mode status
+   */
+  setDarkMode: (u: React.SetStateAction<boolean>) => void;
+};
 
 /**
  * Return current dark mode status and set function
@@ -31,40 +67,7 @@ const useDynamicStyle = (): [IAppStyles, boolean] => {
 /**
  * Make and style builder using hook
  */
-const useStyleBuilder = (): {
-  /**
-   * Convert tachyons syntax string to react native style
-   * @param styleString String of multi prefix tachyons syntax
-   * @example
-   * // Note: `vw` and `vh` or anything relate to view size will calculated as percent of phone's screen
-   * s(`vw-100 vh-100`) as {height: vh(100), width: vw(100)}
-   * s(`w-100 h-100`) as {height: 100, width: 100}
-   * s(`w-100% h-100%`) as {height: '100%', width: '100%'}
-   * s(`bg`) as {background: style.COLOR.BACKGROUND_HARD}
-   * s(`red`) as {color: style.COLOR.RED}
-   * s(`relative`) as {position: 'relative'}
-   * s(`f1 prime bold`) as {fontSize: style.FONT.SIZE.xl, color: style.COLORS.PRIME, fontWeight: style.FONT.WEIGHT.bold}
-   */
-  s: (styleString: string) => {} | null | undefined;
-  /**
-   * Use as normal function with typped
-   * @example
-   * style([f.bold, f.white, f.bg("white")])
-   */
-  f: ReturnType<typeof styleBuilders>;
-  /**
-   * Current style of app
-   */
-  style: IAppStyles;
-  /**
-   * Current dark mode status
-   */
-  isDarkMode: boolean;
-  /**
-   * Set dark mode status
-   */
-  setDarkMode: (u: React.SetStateAction<boolean>) => void;
-} => {
+const useStyleBuilder = (): TUseStyleBuilder => {
   const [style] = useDynamicStyle();
   const { isDarkMode, setDarkMode } = useDarkMode();
   const currentCompiler = BUILDER_PACK[isDarkMode ? 'LIGHT' : 'DARK'];
@@ -73,8 +76,15 @@ const useStyleBuilder = (): {
    * Style builder with callback cache
    */
   const builder = useCallback(
-    (query: string) => {
-      return creator(isDarkMode)(query);
+    <C = {}>(query: string, ...args: StyleProp<C>[]) => {
+      let extra: StyleProp<C | {}> = {};
+      if (args.length > 0) {
+        args.forEach((other) => {
+          extra = merge(extra, other);
+        });
+        return merge(cloneDeep(merge(creator(isDarkMode)(query), extra)), extra) as StyleProp<C>;
+      }
+      return merge(creator(isDarkMode)(query), extra) as StyleProp<C>;
     },
     [isDarkMode],
   );
@@ -110,7 +120,7 @@ const makeCustomBuilder = <T = {}, S = {}, B = {}>(config: {
     DARK: merge(styleBuilders(darkStyle, true), config.builder?.(darkStyle, true)),
     BREAK_POINT: merge(BREAK_POINT, config.breakpoints),
   };
-  const useStyleBuilder = () => {
+  const useStyleBuilder = (): TUseStyleBuilder => {
     const { isDarkMode, setDarkMode } = useDarkMode();
     const currentStyle: IAppStyles & T = isDarkMode ? darkStyle : lightStyle;
     const currentCompiler = compiledStyle[isDarkMode ? 'LIGHT' : 'DARK'] as ReturnType<typeof styleBuilders> & S;
@@ -118,11 +128,19 @@ const makeCustomBuilder = <T = {}, S = {}, B = {}>(config: {
      * Style builder with callback cache
      */
     const builder = useCallback(
-      (query: string) => {
-        return creator(isDarkMode, compiledStyle)(query);
+      <C = {}>(query: string, ...args: StyleProp<C>[]) => {
+        let extra: StyleProp<C | {}> = {};
+        if (args.length > 0) {
+          args.forEach((other) => {
+            extra = merge(extra, other);
+          });
+          return merge(cloneDeep(merge(creator(isDarkMode)(query), extra)), extra) as StyleProp<C>;
+        }
+        return creator(isDarkMode, compiledStyle)(query) as StyleProp<C>;
       },
       [isDarkMode],
     );
+
     return { s: builder, f: currentCompiler, style: currentStyle, isDarkMode, setDarkMode };
   };
   return { useStyleBuilder };

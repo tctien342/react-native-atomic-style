@@ -1,8 +1,16 @@
 import { IAppStyles, IColorStyle } from '@declares/style';
 import { isHexColor } from '@utils/regex';
 
-export const selColor = (style: IAppStyles, select: string, defaultColor: string): string => {
-  if (isHexColor.test(select)) return select;
+export const selColor = (style: IAppStyles, select: string, defaultColor: string, alphaPercent?: number): string => {
+  let alphaPart = '';
+  if (alphaPercent) {
+    if (alphaPercent > 1) {
+      alphaPart = (((alphaPercent / 100) * 255) | (1 << 8)).toString(16).slice(1);
+    } else {
+      alphaPart = ((alphaPercent * 255) | (1 << 8)).toString(16).slice(1);
+    }
+  }
+  if (isHexColor.test(select)) return select + alphaPart;
   let key = select.toUpperCase() as keyof IColorStyle;
   switch (select) {
     case 'hard':
@@ -22,9 +30,9 @@ export const selColor = (style: IAppStyles, select: string, defaultColor: string
       break;
   }
   if (key in style.COLORS) {
-    return style.COLORS[key];
+    return style.COLORS[key] + alphaPart;
   }
-  return defaultColor;
+  return defaultColor + alphaPart;
 };
 
 export const ColorBuilder = <T = {}>(style: IAppStyles & T) => ({
@@ -39,11 +47,16 @@ export const ColorBuilder = <T = {}>(style: IAppStyles & T) => ({
   green: { color: style.COLORS.GREEN },
   black: { color: style.COLORS.BLACK },
   o: (value: number) => ({
-    opacity: value > 1 ? (value / 100).toFixed(2) : value,
+    opacity: value > 1 ? value / 100 : value,
   }),
-  bg: (color: keyof typeof style.COLORS) => {
+  bg: (color: keyof typeof style.COLORS, alphaPercent?: number) => {
     return {
-      backgroundColor: selColor(style, color, style.COLORS.BACKGROUND_HARD),
+      backgroundColor: selColor(style, color, style.COLORS.BACKGROUND_HARD, alphaPercent),
+    };
+  },
+  cl: (color: keyof typeof style.COLORS, alphaPercent?: number) => {
+    return {
+      color: selColor(style, color, style.COLORS.FONT_HARD, alphaPercent),
     };
   },
 });

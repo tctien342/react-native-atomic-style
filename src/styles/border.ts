@@ -37,8 +37,8 @@ export const BorderBuilder = (style: IAppStyles) => ({
   br5: { borderRadius: style.SOLID.l5 },
   br6: { borderRadius: style.SOLID.l6 },
   br7: { borderRadius: style.SOLID.l7 },
-  bc: (color: keyof typeof style.COLORS) => ({
-    borderColor: selColor(style, color, style.COLORS.FONT_HARD),
+  bc: (color: keyof typeof style.COLORS, alphaPercent?: number) => ({
+    borderColor: selColor(style, color, style.COLORS.FONT_HARD, alphaPercent),
   }),
   'b--dot': {
     borderStyle: 'dotted',

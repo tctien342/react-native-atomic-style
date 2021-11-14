@@ -6,12 +6,12 @@ import { isOnlyDigit } from '@utils/regex';
 import { merge } from 'lodash';
 import { StyleProp } from 'react-native';
 
-import { BorderBuilder } from './border';
-import { ColorBuilder } from './color';
-import { PositionBuilder } from './position';
-import { SizeBuilder } from './size';
-import { TextBuilder } from './text';
-import { UtilsBuilder } from './utils';
+import { BorderBuilder, TBorderBuilderKey } from './border';
+import { ColorBuilder, TColorBuilderKey } from './color';
+import { PositionBuilder, TPositionBuilderKey } from './position';
+import { SizeBuilder, TSizeBuilderKey } from './size';
+import { TextBuilder, TTextBuilderKey } from './text';
+import { TUtilsBuilderKey, UtilsBuilder } from './utils';
 
 export const styleBuilders = (style: IAppStyles, isDark: boolean) => ({
   ...BorderBuilder(style),
@@ -22,6 +22,16 @@ export const styleBuilders = (style: IAppStyles, isDark: boolean) => ({
   ...ColorBuilder(style),
   ...getGlobalState('EXTRA_BUILDER')(style, isDark),
 });
+
+export type TBuilderCmd =
+  | TBorderBuilderKey
+  | TColorBuilderKey
+  | TPositionBuilderKey
+  | TSizeBuilderKey
+  | TTextBuilderKey
+  | TUtilsBuilderKey;
+
+export type TBuilderCmdKeys = keyof ReturnType<typeof styleBuilders>;
 
 const LIGHT_BUILDER = styleBuilders(LIGHT_STYLE, false);
 const DARK_BUILDER = styleBuilders(DARK_STYLE, true);
@@ -40,7 +50,9 @@ const cacheBuilder: {
 
 const getStyle = (dark: boolean, token: string, builderPack = BUILDER_PACK): { [key: string]: string | number } => {
   let output = {};
-  const tokenParts = token.split('-').map((v) => (isOnlyDigit.test(v) ? parseInt(v, 10) : v));
+  const tokenParts = token
+    .split('-')
+    .map((v) => (isOnlyDigit.test(v) ? (v.includes('.') ? parseFloat(v) : parseInt(v, 10)) : v));
   const tokenPrefix = tokenParts.shift() as string;
 
   /**
