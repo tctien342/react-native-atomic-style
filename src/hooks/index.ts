@@ -2,7 +2,7 @@ import { useGlobalState } from '@constants/state';
 import { DARK_STYLE, LIGHT_STYLE } from '@constants/style';
 import { RecursivePartial } from '@declares/app';
 import { IAppStyles } from '@declares/style';
-import { BREAK_POINT, BUILDER_PACK, creator, styleBuilders, TBuilderCmd, TBuilderCmdKeys } from '@styles/index';
+import { BREAK_POINT, BUILDER_PACK, creator, styleBuilders } from '@styles/index';
 import { cloneDeep, merge } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { StyleProp } from 'react-native';
@@ -21,7 +21,7 @@ export type TUseStyleBuilder = {
    * s(`relative`) as {position: 'relative'}
    * s(`f1 prime bold`) as {fontSize: style.FONT.SIZE.xl, color: style.COLORS.PRIME, fontWeight: style.FONT.WEIGHT.bold}
    */
-  s: <C = {}>(styleString: string, ...args: StyleProp<C>[]) => StyleProp<C>;
+  s: <C = {}>(styleString: string | TemplateStringsArray, ...args: StyleProp<C>[]) => StyleProp<C>;
   /**
    * Use as normal function with typped
    * @example
@@ -76,7 +76,8 @@ const useStyleBuilder = (): TUseStyleBuilder => {
    * Style builder with callback cache
    */
   const builder = useCallback(
-    <C = {}>(query: string, ...args: StyleProp<C>[]) => {
+    <C = {}>(q: string | TemplateStringsArray, ...args: StyleProp<C>[]) => {
+      const query = typeof q === 'string' ? q : q.join(' ');
       let extra: StyleProp<C | {}> = {};
       if (args.length > 0) {
         args.forEach((other) => {
@@ -128,7 +129,8 @@ const makeCustomBuilder = <T = {}, S = {}, B = {}>(config: {
      * Style builder with callback cache
      */
     const builder = useCallback(
-      <C = {}>(query: string, ...args: StyleProp<C>[]) => {
+      <C = {}>(q: string | TemplateStringsArray, ...args: StyleProp<C>[]) => {
+        const query = typeof q === 'string' ? q : q.join(' ');
         let extra: StyleProp<C | {}> = {};
         if (args.length > 0) {
           args.forEach((other) => {
