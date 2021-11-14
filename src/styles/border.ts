@@ -1,15 +1,27 @@
+import { IAppStyles } from '@declares/style';
+
 import { selColor } from './color';
 
-export const BorderBuilder: TStringBuilder = (style: IAppStyles) => ({
-  ba: () => ({
+export const BorderBuilder = (style: IAppStyles) => ({
+  ba: {
     borderStyle: 'solid',
     borderWidth: 1,
+  },
+  bat: (width = 1) => ({
+    borderStyle: 'solid',
+    borderTopWidth: width,
   }),
-  bdot: () => ({
-    borderStyle: 'dotted',
+  bab: (width = 1) => ({
+    borderStyle: 'solid',
+    borderBottomWidth: width,
   }),
-  bdash: () => ({
-    borderStyle: 'dashed',
+  bal: (width = 1) => ({
+    borderStyle: 'solid',
+    borderLeftWidth: width,
+  }),
+  bar: (width = 1) => ({
+    borderStyle: 'solid',
+    borderRightWidth: width,
   }),
   bw: (width?: number) => ({
     borderWidth: width || 1,
@@ -17,29 +29,45 @@ export const BorderBuilder: TStringBuilder = (style: IAppStyles) => ({
   br: (radius?: number) => ({
     borderRadius: radius || style.BORDER.RADIUS.default,
   }),
-  bc: (color: string) => ({
-    borderColor: selColor(style, color, style.COLORS.FONT_HARD),
+  br0: { borderRadius: 0 },
+  br1: { borderRadius: style.SOLID.l1 },
+  br2: { borderRadius: style.SOLID.l2 },
+  br3: { borderRadius: style.SOLID.l3 },
+  br4: { borderRadius: style.SOLID.l4 },
+  br5: { borderRadius: style.SOLID.l5 },
+  br6: { borderRadius: style.SOLID.l6 },
+  br7: { borderRadius: style.SOLID.l7 },
+  bc: (color: keyof typeof style.COLORS, alphaPercent?: number) => ({
+    borderColor: selColor(style, color, style.COLORS.FONT_HARD, alphaPercent),
   }),
-  brBtn: () => ({
+  'b--dot': {
+    borderStyle: 'dotted',
+  },
+  'b--dash': {
+    borderStyle: 'dashed',
+  },
+  'br-btn': {
     borderRadius: style.BORDER.RADIUS.default,
-  }),
-  brPill: () => ({
+  },
+  'br-pill': {
     borderRadius: style.BORDER.RADIUS.pill,
-  }),
-  brBottom: () => ({
+  },
+  'br--bottom': {
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
-  }),
-  brTop: () => ({
+  },
+  'br--top': {
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
-  }),
-  brRight: () => ({
+  },
+  'br--right': {
     borderTopLeftRadius: 0,
     borderBottomLeftRadius: 0,
-  }),
-  brLeft: () => ({
+  },
+  'br--left': {
     borderBottomRightRadius: 0,
     borderTopRightRadius: 0,
-  }),
+  },
 });
+
+export type TBorderBuilderKey = ReturnType<typeof BorderBuilder>;

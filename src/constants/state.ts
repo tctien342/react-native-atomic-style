@@ -1,31 +1,9 @@
 import { createGlobalState } from 'react-hooks-global-state';
 
-import { DARK_STYLE, LIGHT_STYLE } from './style';
+import { LIB_DEFAULT } from './default';
 
-const GLOBAL_LIGHT_STYLE_KEY = 'GLOBAL_LIGHT_STYLE_KEY';
-const GLOBAL_DARK_STYLE_KEY = 'GLOBAL_DARK_STYLE_KEY';
-const GLOBAL_STYLE_RULE_KEY = 'GLOBAL_STYLE_RULE_KEY';
-const GLOBAL_DARKMODE_STATE = 'GLOBAL_DARKMODE_STATE';
-const GLOBAL_BREAKPOINT_KEY = 'GLOBAL_BREAKPOINT_KEY';
-
-const INITIAL_STATES = {
-  [GLOBAL_LIGHT_STYLE_KEY]: LIGHT_STYLE,
-  [GLOBAL_DARK_STYLE_KEY]: DARK_STYLE,
-  [GLOBAL_BREAKPOINT_KEY]: {},
-  [GLOBAL_STYLE_RULE_KEY]: {},
-  [GLOBAL_DARKMODE_STATE]: false,
-};
+const INITIAL_STATES = LIB_DEFAULT;
 
 const { useGlobalState, getGlobalState, setGlobalState } = createGlobalState(INITIAL_STATES);
 
-export {
-  getGlobalState,
-  GLOBAL_BREAKPOINT_KEY,
-  GLOBAL_DARK_STYLE_KEY,
-  GLOBAL_DARKMODE_STATE,
-  GLOBAL_LIGHT_STYLE_KEY,
-  GLOBAL_STYLE_RULE_KEY,
-  INITIAL_STATES,
-  setGlobalState,
-  useGlobalState,
-};
+export { getGlobalState, setGlobalState, useGlobalState };

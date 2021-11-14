@@ -1,110 +1,33 @@
-import {
-  GLOBAL_BREAKPOINT_KEY,
-  GLOBAL_DARK_STYLE_KEY,
-  GLOBAL_DARKMODE_STATE,
-  GLOBAL_LIGHT_STYLE_KEY,
-  GLOBAL_STYLE_RULE_KEY,
-  useGlobalState,
-} from '@constants/state';
-import { s } from '@styles/index';
+import { useGlobalState } from '@constants/state';
+import { DARK_STYLE, LIGHT_STYLE } from '@constants/style';
+import { RecursivePartial } from '@declares/app';
+import { IAppStyles } from '@declares/style';
+import { BREAK_POINT, BUILDER_PACK, creator, styleBuilders } from '@styles/index';
+import { cloneDeep, merge } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
-import { StyleProp, TextStyle, ViewStyle } from 'react-native';
+import { StyleProp } from 'react-native';
 
-const useOverrideBuilder = () => {
-  const [crrRule, setRules] = useGlobalState(GLOBAL_STYLE_RULE_KEY);
-  const [crrLight, setLightStyle] = useGlobalState(GLOBAL_LIGHT_STYLE_KEY);
-  const [crrDark, setDarkStyle] = useGlobalState(GLOBAL_DARK_STYLE_KEY);
-  const [crrBreaks, setBreakPoint] = useGlobalState(GLOBAL_BREAKPOINT_KEY);
-
-  /**
-   * Define your custom build rules
-   * @param rules Your custom rules
-   * ## Example
-   * ```js
-   * { "wh": (arg1, arg2) => ({width: arg1, height: arg2}) }
-   * ```
-   * `wh-10-22` will be { width: 10, height: 22 }
-   * ```js
-   * { "pa--l1": () => ({ padding: $l1 }) }
-   * ```
-   * `pa--btn` will be { padding: $l1 }
-   */
-  const overrideRules = (newRule: { [key: string]: (...arg) => StyleProp<ViewStyle> | StyleProp<TextStyle> }) => {
-    setRules({ ...crrRule, ...newRule });
-  };
-
-  /**
-   * Override current app style
-   * @param style New style for app
-   * @param isLightStyle True for set light theme
-   */
-  const overrideStyle = (style: Partial<IAppStyles>, isLightStyle = true) => {
-    if (isLightStyle) {
-      setLightStyle({ ...crrLight, ...style });
-    } else {
-      setDarkStyle({ ...crrDark, ...style });
-    }
-  };
-
-  /**
-   * Add new breakpoint into builder
-   * ```js
-   * {
-   * i: () => Platform.OS !== 'ios'
-   * a: () => Platform.OS !== 'android'
-   * }
-   * ```
-   * => `w-10-i` will only in `ios`
-   * and `w-10-a` will only in `android`
-   * @param breakpoints New breakpoint to be declare
-   */
-  const overrideBreakpoint = (breakpoints: { [key: string]: (dark?: boolean) => boolean }) => {
-    setBreakPoint({ ...crrBreaks, ...breakpoints });
-  };
-
-  return { overrideRules, overrideStyle, overrideBreakpoint };
-};
-
-/**
- * Return current dark mode status and set function
- */
-const useDarkMode = () => {
-  const [isDarkMode, setDarkMode] = useGlobalState(GLOBAL_DARKMODE_STATE);
-  return { isDarkMode, setDarkMode };
-};
-
-/**
- * Get style base on current phone dark mode status
- */
-const useDynamicStyle = (): [IAppStyles, boolean] => {
-  const [isDarkMode] = useGlobalState(GLOBAL_DARKMODE_STATE);
-  const [lightTheme] = useGlobalState(GLOBAL_LIGHT_STYLE_KEY);
-  const [darkTheme] = useGlobalState(GLOBAL_DARK_STYLE_KEY);
-  const [style, setStyle] = useState<IAppStyles>(isDarkMode ? darkTheme : lightTheme);
-  useEffect(() => {
-    setStyle(isDarkMode ? darkTheme : lightTheme);
-  }, [isDarkMode]);
-  return [style, isDarkMode];
-};
-
-/**
- * Make and style builder using hook
- */
-const useStyleBuilder = (): {
+export type TUseStyleBuilder = {
   /**
    * Convert tachyons syntax string to react native style
    * @param styleString String of multi prefix tachyons syntax
    * @example
    * // Note: `vw` and `vh` or anything relate to view size will calculated as percent of phone's screen
    * s(`vw-100 vh-100`) as {height: vh(100), width: vw(100)}
-   * s(`w-100 h-100`) as {height: 100, width: 100}
+   * s(`w-100 h-100`, {opacity: 0.1}) as {height: 100, width: 100, opacity: 0.1}
    * s(`w-100% h-100%`) as {height: '100%', width: '100%'}
    * s(`bg`) as {background: style.COLOR.BACKGROUND_HARD}
    * s(`red`) as {color: style.COLOR.RED}
    * s(`relative`) as {position: 'relative'}
    * s(`f1 prime bold`) as {fontSize: style.FONT.SIZE.xl, color: style.COLORS.PRIME, fontWeight: style.FONT.WEIGHT.bold}
    */
-  s: (styleString: string) => {} | null | undefined;
+  s: <C = {}>(styleString: string | TemplateStringsArray, ...args: StyleProp<C>[]) => StyleProp<C>;
+  /**
+   * Use as normal function with typped
+   * @example
+   * style([f.bold, f.white, f.bg("white")])
+   */
+  f: ReturnType<typeof styleBuilders>;
   /**
    * Current style of app
    */
@@ -117,23 +40,112 @@ const useStyleBuilder = (): {
    * Set dark mode status
    */
   setDarkMode: (u: React.SetStateAction<boolean>) => void;
-} => {
+};
+
+/**
+ * Return current dark mode status and set function
+ */
+const useDarkMode = () => {
+  const [mode, setMode] = useGlobalState('THEME_MODE');
+  return { isDarkMode: mode === 'dark', setDarkMode: (isDark: boolean) => setMode(isDark ? 'dark' : 'light') };
+};
+
+/**
+ * Get style base on current phone dark mode status
+ */
+const useDynamicStyle = (): [IAppStyles, boolean] => {
+  const { isDarkMode } = useDarkMode();
+  const [style, setStyle] = useState<IAppStyles>(isDarkMode ? DARK_STYLE : LIGHT_STYLE);
+
+  useEffect(() => {
+    setStyle(isDarkMode ? DARK_STYLE : LIGHT_STYLE);
+  }, [isDarkMode]);
+
+  return [style, isDarkMode];
+};
+
+/**
+ * Make and style builder using hook
+ */
+const useStyleBuilder = (): TUseStyleBuilder => {
   const [style] = useDynamicStyle();
   const { isDarkMode, setDarkMode } = useDarkMode();
-  const [overrideRules] = useGlobalState(GLOBAL_STYLE_RULE_KEY);
-  const [breakpoints] = useGlobalState(GLOBAL_BREAKPOINT_KEY);
+  const currentCompiler = BUILDER_PACK[isDarkMode ? 'LIGHT' : 'DARK'];
 
   /**
    * Style builder with callback cache
    */
   const builder = useCallback(
-    (query: string) => {
-      return s(isDarkMode, breakpoints, overrideRules)(query);
+    <C = {}>(q: string | TemplateStringsArray, ...args: StyleProp<C>[]) => {
+      const query = typeof q === 'string' ? q : q.join(' ');
+      let extra: StyleProp<C | {}> = {};
+      if (args.length > 0) {
+        args.forEach((other) => {
+          extra = merge(extra, other);
+        });
+        return merge(cloneDeep(merge(creator(isDarkMode)(query), extra)), extra) as StyleProp<C>;
+      }
+      return merge(creator(isDarkMode)(query), extra) as StyleProp<C>;
     },
-    [isDarkMode, breakpoints, overrideRules],
+    [isDarkMode],
   );
 
-  return { s: builder, style, isDarkMode, setDarkMode };
+  return { s: builder, f: currentCompiler, style, isDarkMode, setDarkMode };
 };
 
-export { useDarkMode, useDynamicStyle, useOverrideBuilder, useStyleBuilder };
+/**
+ * Make an custom builder for your app
+ */
+const makeCustomBuilder = <T = {}, S = {}, B = {}>(config: {
+  /**
+   * Add extra style config for light mode
+   */
+  light?: RecursivePartial<IAppStyles> & T;
+  /**
+   * Add extra style config for dark mode
+   */
+  dark?: RecursivePartial<IAppStyles> & T;
+  /**
+   * Add extra breakpoint for builder
+   */
+  breakpoints?: RecursivePartial<typeof BREAK_POINT> & B;
+  /**
+   * Add extra builder
+   */
+  builder?: (style: IAppStyles & T, isDark: boolean) => S;
+}) => {
+  const lightStyle = merge(LIGHT_STYLE, config.light) as any;
+  const darkStyle = merge(DARK_STYLE, config.dark) as any;
+  const compiledStyle = {
+    LIGHT: merge(styleBuilders(lightStyle, false), config.builder?.(lightStyle, false)),
+    DARK: merge(styleBuilders(darkStyle, true), config.builder?.(darkStyle, true)),
+    BREAK_POINT: merge(BREAK_POINT, config.breakpoints),
+  };
+  const useStyleBuilder = (): TUseStyleBuilder => {
+    const { isDarkMode, setDarkMode } = useDarkMode();
+    const currentStyle: IAppStyles & T = isDarkMode ? darkStyle : lightStyle;
+    const currentCompiler = compiledStyle[isDarkMode ? 'LIGHT' : 'DARK'] as ReturnType<typeof styleBuilders> & S;
+    /**
+     * Style builder with callback cache
+     */
+    const builder = useCallback(
+      <C = {}>(q: string | TemplateStringsArray, ...args: StyleProp<C>[]) => {
+        const query = typeof q === 'string' ? q : q.join(' ');
+        let extra: StyleProp<C | {}> = {};
+        if (args.length > 0) {
+          args.forEach((other) => {
+            extra = merge(extra, other);
+          });
+          return merge(cloneDeep(merge(creator(isDarkMode)(query), extra)), extra) as StyleProp<C>;
+        }
+        return creator(isDarkMode, compiledStyle)(query) as StyleProp<C>;
+      },
+      [isDarkMode],
+    );
+
+    return { s: builder, f: currentCompiler, style: currentStyle, isDarkMode, setDarkMode };
+  };
+  return { useStyleBuilder };
+};
+
+export { makeCustomBuilder, useDarkMode, useDynamicStyle, useStyleBuilder };
