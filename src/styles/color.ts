@@ -35,17 +35,22 @@ export const selColor = (style: IAppStyles, select: string, defaultColor: string
   return defaultColor + alphaPart;
 };
 
+const generateColorPrefix = <T = {}>(style: IAppStyles & T) => {
+  const out = Object.keys(style.COLORS).reduce(
+    (prev, curr) => ({
+      ...prev,
+      [curr.toLowerCase()]: { color: style.COLORS[curr] },
+    }),
+    {},
+  ) as { [key in Lowercase<keyof typeof style.COLORS>]: { color: string } };
+  return out;
+};
+
 export const ColorBuilder = <T = {}>(style: IAppStyles & T) => ({
-  white: { color: style.COLORS.WHITE },
+  ...generateColorPrefix(style),
   hard: { color: style.COLORS.FONT_HARD },
   light: { color: style.COLORS.FONT_LIGHT },
-  prime: { color: style.COLORS.PRIME },
   purble: { color: style.COLORS.PURPLE },
-  blue: { color: style.COLORS.BLUE },
-  orange: { color: style.COLORS.ORANGE },
-  red: { color: style.COLORS.RED },
-  green: { color: style.COLORS.GREEN },
-  black: { color: style.COLORS.BLACK },
   o: (value: number) => ({
     opacity: value > 1 ? value / 100 : value,
   }),

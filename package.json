@@ -1,6 +1,6 @@
 {
   "name": "@tctien342/react-native-atomic-style",
-  "version": "2.0.1-rev1",
+  "version": "2.0.1-rev3",
   "description": "ReactUI library by @SaintNo",
   "main": "build/index.js",
   "module": "build/index.es.js",

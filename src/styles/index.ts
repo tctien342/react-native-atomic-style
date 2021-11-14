@@ -50,6 +50,7 @@ const cacheBuilder: {
 
 const getStyle = (dark: boolean, token: string, builderPack = BUILDER_PACK): { [key: string]: string | number } => {
   let output = {};
+  let rawCmd = token;
   const tokenParts = token
     .split('-')
     .map((v) => (isOnlyDigit.test(v) ? (v.includes('.') ? parseFloat(v) : parseInt(v, 10)) : v));
@@ -68,15 +69,16 @@ const getStyle = (dark: boolean, token: string, builderPack = BUILDER_PACK): { [
       return output;
     }
     tokenParts.pop();
+    rawCmd = rawCmd.replace(`-${deviceBreakpoint}`, '');
     deviceBreakpoint = tokenParts.slice(-1)[0];
   }
 
   const builder = dark ? builderPack.DARK : builderPack.LIGHT;
-  if (builder[token]) {
+  if (builder[rawCmd]) {
     /**
      * If token is passthroght
      */
-    const out = builder[token];
+    const out = builder[rawCmd];
     if (typeof out !== 'function') {
       output = out;
     }
@@ -88,6 +90,8 @@ const getStyle = (dark: boolean, token: string, builderPack = BUILDER_PACK): { [
       const buildCmd = builder[tokenPrefix];
       if (typeof buildCmd === 'function') {
         output = buildCmd(...tokenParts);
+      } else {
+        output = builder[tokenPrefix];
       }
     }
   }
