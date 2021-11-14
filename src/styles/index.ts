@@ -1,6 +1,8 @@
 import { DEVICE_BREAK_POINT } from '@constants/breakpoint';
 import { getGlobalState } from '@constants/state';
 import { DARK_STYLE, LIGHT_STYLE } from '@constants/style';
+import { IAppStyles } from '@declares/style';
+import { isOnlyDigit } from '@utils/regex';
 import { merge } from 'lodash';
 import { StyleProp } from 'react-native';
 
@@ -23,9 +25,8 @@ export const styleBuilders = (style: IAppStyles, isDark: boolean) => ({
 
 const LIGHT_BUILDER = styleBuilders(LIGHT_STYLE, false);
 const DARK_BUILDER = styleBuilders(DARK_STYLE, true);
-export const BUILDER_PACK = { LIGHT: LIGHT_BUILDER, DARK: DARK_BUILDER };
-const BREAK_POINT = { ...DEVICE_BREAK_POINT, ...getGlobalState('EXTRA_BREAKPOINT') };
-const BREAK_KEYS = Object.keys(BREAK_POINT);
+export const BREAK_POINT = { ...DEVICE_BREAK_POINT, ...getGlobalState('EXTRA_BREAKPOINT') };
+export const BUILDER_PACK = { LIGHT: LIGHT_BUILDER, DARK: DARK_BUILDER, BREAK_POINT: BREAK_POINT };
 
 /**
  * Cached builded styles for not build it each time call again with same build string
@@ -39,12 +40,25 @@ const cacheBuilder: {
 
 const getStyle = (dark: boolean, token: string, builderPack = BUILDER_PACK): { [key: string]: string | number } => {
   let output = {};
-  const tokenParts = token.split('-');
-  const tokenPrefix = tokenParts.shift();
-  const deviceBreakpoint = tokenParts.at(-1);
-  if (deviceBreakpoint && BREAK_KEYS.includes(deviceBreakpoint)) {
-    if (!BREAK_POINT[deviceBreakpoint]) return output;
+  const tokenParts = token.split('-').map((v) => (isOnlyDigit.test(v) ? parseInt(v, 10) : v));
+  const tokenPrefix = tokenParts.shift() as string;
+
+  /**
+   * Support multi breakpoint at once
+   */
+  let deviceBreakpoint = tokenParts.slice(-1)[0];
+  const breakKeys = Object.keys(builderPack.BREAK_POINT);
+  while (typeof deviceBreakpoint === 'string' && breakKeys.includes(deviceBreakpoint)) {
+    const breakCmd = builderPack.BREAK_POINT[deviceBreakpoint];
+    if (typeof breakCmd === 'function') {
+      if (!breakCmd(dark)) return output;
+    } else if (!breakCmd) {
+      return output;
+    }
+    tokenParts.pop();
+    deviceBreakpoint = tokenParts.slice(-1)[0];
   }
+
   const builder = dark ? builderPack.DARK : builderPack.LIGHT;
   if (builder[token]) {
     /**

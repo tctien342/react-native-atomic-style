@@ -32,7 +32,7 @@ export const UtilsBuilder = () => ({
     },
     shadowOpacity: 0.2,
     shadowRadius: depth,
-    elevation: 4,
+    elevation: depth,
   }),
   df: { display: 'flex' },
   dn: { display: 'none' },

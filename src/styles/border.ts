@@ -1,3 +1,5 @@
+import { IAppStyles } from '@declares/style';
+
 import { selColor } from './color';
 
 export const BorderBuilder = (style: IAppStyles) => ({
@@ -5,6 +7,22 @@ export const BorderBuilder = (style: IAppStyles) => ({
     borderStyle: 'solid',
     borderWidth: 1,
   },
+  bat: (width = 1) => ({
+    borderStyle: 'solid',
+    borderTopWidth: width,
+  }),
+  bab: (width = 1) => ({
+    borderStyle: 'solid',
+    borderBottomWidth: width,
+  }),
+  bal: (width = 1) => ({
+    borderStyle: 'solid',
+    borderLeftWidth: width,
+  }),
+  bar: (width = 1) => ({
+    borderStyle: 'solid',
+    borderRightWidth: width,
+  }),
   bw: (width?: number) => ({
     borderWidth: width || 1,
   }),

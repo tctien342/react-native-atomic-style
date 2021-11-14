@@ -1,7 +1,7 @@
-type TDevice = 'sm' | 'lg' | 'pad';
-type TThemeMode = 'dark' | 'light';
+export type TDevice = 'sm' | 'lg' | 'pad';
+export type TThemeMode = 'dark' | 'light';
 
-interface ISolidSize {
+export interface ISolidSize {
   l1: number;
   l2: number;
   l3: number;
@@ -11,7 +11,7 @@ interface ISolidSize {
   l7: number;
 }
 
-interface IFontSize {
+export interface IFontSize {
   f7: number;
   f6: number;
   f5: number;
@@ -21,7 +21,7 @@ interface IFontSize {
   f1: number;
 }
 
-interface IFontWeight {
+export interface IFontWeight {
   thin: string;
   bold: string;
   default: string;
@@ -30,7 +30,7 @@ interface IFontWeight {
 /**
  * Style configuration for app
  */
-interface IColorStyle {
+export interface IColorStyle {
   /**
    * App primary color
    */
@@ -65,7 +65,7 @@ interface IColorStyle {
   BACKGROUND_HARD: string;
 }
 
-interface IFontStyle {
+export interface IFontStyle {
   /**
    * Font weight
    */
@@ -76,14 +76,14 @@ interface IFontStyle {
   SIZE: IFontSize;
 }
 
-interface IBorderStyle {
+export interface IBorderStyle {
   RADIUS: {
     default: number;
     pill: number;
   } & ISolidSize;
 }
 
-interface IAppStyles {
+export interface IAppStyles {
   /**
    * App colors
    */
@@ -99,12 +99,13 @@ interface IAppStyles {
   SOLID: ISolidSize;
 }
 
-type TTokenOutput = ((...args) => { [key: string]: any }) | { [key: string]: any };
-type TStringBuilder = (style: IAppStyles) => { [key: string]: TTokenOutput };
-type TStringExtraBuilder = (style: IAppStyles, isDark: boolean) => { [key: string]: TTokenOutput };
-type TBreakpoint = { [key: string]: boolean };
+export type TTokenOutput = ((...args) => { [key: string]: any }) | { [key: string]: any };
+export type TStringBuilder = (style: IAppStyles) => { [key: string]: TTokenOutput };
+export type TStringExtraBuilder = (style: IAppStyles, isDark: boolean) => { [key: string]: TTokenOutput };
+export type TBreakpointFunction = (isDark: boolean) => boolean;
+export type TBreakpoint = { [key: string]: TBreakpointFunction | boolean };
 
-interface ISizeConfig {
+export interface ISizeConfig {
   /**
    * Current scale you are work in, this will affect auto scale of width, height and fontSize.
    * Default base on Iphone5 => ScreenWidth / 320

@@ -1,7 +1,7 @@
+import { TBreakpoint } from '@declares/style';
 import { Platform } from 'react-native';
 
 import { SCREEN_TYPE } from './size';
-import { getGlobalState } from './state';
 
 /**
  * Break point for device prefix in build string
@@ -12,14 +12,8 @@ const DEVICE_BREAK_POINT: TBreakpoint = {
   web: Platform.OS === 'web',
   win: Platform.OS === 'windows',
   mac: Platform.OS === 'macos',
-  l: (() => {
-    const mode = getGlobalState('THEME_MODE');
-    return mode === 'light';
-  })(),
-  d: (() => {
-    const mode = getGlobalState('THEME_MODE');
-    return mode === 'dark';
-  })(),
+  l: (dark) => !dark,
+  d: (dark) => dark,
   pad: SCREEN_TYPE === 'pad',
   lg: SCREEN_TYPE === 'lg',
   sm: SCREEN_TYPE === 'sm',

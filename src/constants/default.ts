@@ -1,3 +1,13 @@
+import {
+  IColorStyle,
+  IFontSize,
+  IFontWeight,
+  ISolidSize,
+  TBreakpoint,
+  TStringExtraBuilder,
+  TThemeMode,
+} from '@declares/style';
+
 const LIB_DEFAULT: {
   /**
    * This help detect old device (16:9) vs new device (>16:9)

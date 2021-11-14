@@ -1,3 +1,4 @@
+import { IAppStyles } from '@declares/style';
 import { reScale } from '@utils/style';
 
 export const TextBuilder = (style: IAppStyles) => ({

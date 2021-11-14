@@ -1,3 +1,4 @@
+import { IAppStyles, IColorStyle } from '@declares/style';
 import { isHexColor } from '@utils/regex';
 
 export const selColor = (style: IAppStyles, select: string, defaultColor: string): string => {

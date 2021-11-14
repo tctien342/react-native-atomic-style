@@ -1,4 +1,5 @@
 import { LIB_DEFAULT } from '@constants/default';
+import { IAppStyles } from '@declares/style';
 
 export const PositionBuilder = (style: IAppStyles) => ({
   top: (offset: number | string = 0) => ({
@@ -46,6 +47,30 @@ export const PositionBuilder = (style: IAppStyles) => ({
   pa5: { padding: style.SOLID.l5 },
   pa6: { padding: style.SOLID.l6 },
   pa7: { padding: style.SOLID.l7 },
+  pv: (size: number | string = LIB_DEFAULT.SOLID_SIZE.l1) => ({
+    paddingTop: size,
+    paddingBottom: size,
+  }),
+  pv0: { paddingTop: 0, paddingBottom: 0 },
+  pv1: { paddingTop: style.SOLID.l1, paddingBottom: style.SOLID.l1 },
+  pv2: { paddingTop: style.SOLID.l2, paddingBottom: style.SOLID.l2 },
+  pv3: { paddingTop: style.SOLID.l3, paddingBottom: style.SOLID.l3 },
+  pv4: { paddingTop: style.SOLID.l4, paddingBottom: style.SOLID.l4 },
+  pv5: { paddingTop: style.SOLID.l5, paddingBottom: style.SOLID.l5 },
+  pv6: { paddingTop: style.SOLID.l6, paddingBottom: style.SOLID.l6 },
+  pv7: { paddingTop: style.SOLID.l7, paddingBottom: style.SOLID.l7 },
+  ph: (size: number | string = LIB_DEFAULT.SOLID_SIZE.l1) => ({
+    paddingLeft: size,
+    paddingRight: size,
+  }),
+  ph0: { paddingLeft: 0, paddingRight: 0 },
+  ph1: { paddingLeft: style.SOLID.l1, paddingRight: style.SOLID.l1 },
+  ph2: { paddingLeft: style.SOLID.l2, paddingRight: style.SOLID.l2 },
+  ph3: { paddingLeft: style.SOLID.l3, paddingRight: style.SOLID.l3 },
+  ph4: { paddingLeft: style.SOLID.l4, paddingRight: style.SOLID.l4 },
+  ph5: { paddingLeft: style.SOLID.l5, paddingRight: style.SOLID.l5 },
+  ph6: { paddingLeft: style.SOLID.l6, paddingRight: style.SOLID.l6 },
+  ph7: { paddingLeft: style.SOLID.l7, paddingRight: style.SOLID.l7 },
   pt: (size: number | string = LIB_DEFAULT.SOLID_SIZE.l1) => ({
     paddingTop: size,
   }),

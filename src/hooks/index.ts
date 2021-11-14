@@ -1,6 +1,8 @@
 import { useGlobalState } from '@constants/state';
 import { DARK_STYLE, LIGHT_STYLE } from '@constants/style';
-import { BUILDER_PACK, creator, styleBuilders } from '@styles/index';
+import { RecursivePartial } from '@declares/app';
+import { IAppStyles } from '@declares/style';
+import { BREAK_POINT, BUILDER_PACK, creator, styleBuilders } from '@styles/index';
 import { merge } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -83,7 +85,7 @@ const useStyleBuilder = (): {
 /**
  * Make an custom builder for your app
  */
-const makeCustomBuilder = <T = {}, S = {}>(config: {
+const makeCustomBuilder = <T = {}, S = {}, B = {}>(config: {
   /**
    * Add extra style config for light mode
    */
@@ -92,6 +94,10 @@ const makeCustomBuilder = <T = {}, S = {}>(config: {
    * Add extra style config for dark mode
    */
   dark?: RecursivePartial<IAppStyles> & T;
+  /**
+   * Add extra breakpoint for builder
+   */
+  breakpoints?: RecursivePartial<typeof BREAK_POINT> & B;
   /**
    * Add extra builder
    */
@@ -102,6 +108,7 @@ const makeCustomBuilder = <T = {}, S = {}>(config: {
   const compiledStyle = {
     LIGHT: merge(styleBuilders(lightStyle, false), config.builder?.(lightStyle, false)),
     DARK: merge(styleBuilders(darkStyle, true), config.builder?.(darkStyle, true)),
+    BREAK_POINT: merge(BREAK_POINT, config.breakpoints),
   };
   const useStyleBuilder = () => {
     const { isDarkMode, setDarkMode } = useDarkMode();

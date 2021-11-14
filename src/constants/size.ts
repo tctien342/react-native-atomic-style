@@ -1,3 +1,4 @@
+import { TDevice } from '@declares/style';
 import { isTablet } from '@utils/common';
 import { Dimensions } from 'react-native';
 

@@ -1,4 +1,5 @@
 import { MIN_DIMENSION } from '@constants/size';
+import { IAppStyles } from '@declares/style';
 import { reScale, vh, vw } from '@utils/style';
 
 export const SizeBuilder = (style: IAppStyles) => ({
