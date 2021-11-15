@@ -36,7 +36,7 @@ export const TextBuilder = (style: IAppStyles) => ({
     fontSize: reScale(size),
   }),
   fw: (size: string = style.FONT.WEIGHT.default) => ({
-    fontWeight: size,
+    fontWeight: size.toString(),
   }),
   thin: {
     fontWeight: style.FONT.WEIGHT.thin,

@@ -1,171 +1,224 @@
-# react-native-atomic-style
+# React Native Atomic Style
+> Make your react native style more easier
 
-Make your react style more easier
+<img src="intro.png" style="margin: auto" />
 
-#### Install
-
-`yarn add @tctien342/react-native-atomic-style`
-
-#### Config functions
-
-- setSizeConfig() `Config scale`
-#### Support hooks
-
-- useOverrideBuilder()
-- useDarkMode() => {isDarkMode, setDarkMode}
-- useDynamicStyle => [currentStyle, isDarkMode]
-- useStyleBuilder => { 
-  ```ts
-    /**
-	 * Convert tachyons syntax string to react native style
-	 * @param styleString String of multi prefix tachyons syntax
-	 * @example
-	 * // Note: `vw` and `vh` or anything relate to view size will calculated as percent of phone's screen
-	 * s(`vw-100 vh-100`) as {height: vh(100), width: vw(100)}
-	 * s(`w-100 h-100`) as {height: 100, width: 100}
-	 * s(`w-100% h-100%`) as {height: '100%', width: '100%'}
-	 * s(`bg`) as {background: style.COLOR.BACKGROUND_HARD}
-	 * s(`red`) as {color: style.COLOR.RED}
-	 * s(`relative`) as {position: 'relative'}
-	 * s(`f1 prime bold`) as {fontSize: style.FONT.SIZE.xl, color: style.COLORS.PRIME, fontWeight: style.FONT.WEIGHT.bold}
-	 */
-    s:(str)
-    /**
-	 * Current style of app
-	 */
-	style: IAppStyles;
-	/**
-	 * Current dark mode status
-	 */
-	isDarkMode: boolean;
-	/**
-	 * Set dark mode status
-	 */
-	setDarkMode: (u: React.SetStateAction<boolean>) => void;
-    ```
-}
-
-#### Import hook and using it
-
-- Example
-
-```tsx
-    import { useStyleBuilder } from '@tctien342/react-native-atomic-style';
-    // On function component body
-    const { s } = useStyleBuilder();
-    // On render
-    <Text style={s("f1 bold")}></Text>
-    // => style={{ fontSize: {$MaxSize}, fontWeight: ${BoldWeight} }}
-    <View style={s("flex vw-100")}></View>
-    // => style={{ flex: 1, width: ${PhoneWidth*100%} }}
-    <View style={[ s("flex bg-blue"),{ zIndex: -1} ]}></View>
-    // => style={{ flex: 1, backgroundColor: ${blue}, zIndex: -1}}
-
-    <View style={s('flex w-100 h-100 bg-hard')}></View>
-    <View style={s('flex w-10% h-10% bg-blue pa-2%')}></View>
-    <Text style={s('f1 bold hard tr w-100%')}></Text>
+## Install
+```bash
+# Install using yarn
+yarn add @tctien342/react-native-atomic-style
+# Or prefer npm way
+npm install @tctien342/react-native-atomic-style
 ```
 
-#### Support breaks point
-> Your override or add breakpoint by use `useOverrideBuilder` and pick `overrideBreakpoint`
+## Usage
+```ts
+  // Use with `useStyleBuilder`
+  const {s, style, isDarkMode, setDarkMode} = useStyleBuilder();
+```
+What included:
+### `s(query: string | TemplateStringArray, ...args: PropStyle[])` 
+> Use for tranform style string into react native style
+
+Can be use as two way:
+```ts
+ s('h-100% w-100%', {backgroundColor: "#123321"}) // Function style
+ s`h-100% w-100% ${{backgroundColor: "#123321"}}` // Template string style
+ // Output => {height: 100%, width: 100%, backgroundColor: "#123321"}
+```
+### `isDarkMode: boolean` and `setDarkMode(state: boolean)`
+> Use for set app dark mode and get current darkmode value
+
+### `style: IAppStyles`
+> Current style of app, for getting style value
+
+## Support breaks point
+> For switching style between OS and screens
 
 ```ts
-const breakpoint = {
-  i: () => Platform.OS === 'android',
-  a: () => Platform.OS === 'ios',
-  l: (dark: boolean) => dark,
-  d: (dark: boolean) => !dark,
-  pad: () => SCREEN_TYPE !== 'pad',
-  lg: () => SCREEN_TYPE !== 'lg',
-  sm: () => SCREEN_TYPE !== 'sm',
+const defaultBreakpoint = {
+    i: Platform.OS === 'ios',
+    a: Platform.OS === 'android',
+    web: Platform.OS === 'web',
+    win: Platform.OS === 'windows',
+    mac: Platform.OS === 'macos',
+    l: (dark) => !dark,
+    d: (dark) => dark,
+    pad: SCREEN_TYPE === 'pad',
+    lg: SCREEN_TYPE === 'lg',
+    sm: SCREEN_TYPE === 'sm',
 };
+// Example
+s`bg-white-i bg-purple-a pa3 br-pill br1-a pl4 pr4 shadow-3`
+// => Android will have purple background and ios will have white background
 ```
 
-- Example
 
+## Example
+```tsx
+import {useStyleBuilder} from '@tctien342/react-native-atomic-style';
+/**COMPONENT**/
+const {s} = useStyleBuilder();
+
+return <View style={s`flex pa4 br3 ba bc-light bw-3 shadow-6 bg-blue w100 mb2`}>
+  <View style={s`flex flex-row center-items`}>
+    <Text style={s`white f1 flex-1`}>Hello World</Text>
+  </View>
+  <Text style={s`mt4 f3 gray white bold`}>
+    Lorem ipsum dolor sit amet consectetur, adipisicing elit. Totam,
+    perferendis nulla quod odit aliquam temporibus sed iusto a, sit
+    ratione modi et eius? Laboriosam molestiae vero, explicabo quas porro
+    aliquid.
+  </Text>
+  <View style={s`w100 mt4 items-end`}>
+    <TouchableOpacity
+      style={s`bg-white-i bg-purple-a pa3 br-pill br1-a pl4 pr4 shadow-3`}>
+      <Text style={s`bold black-i white-a`}>Click Me</Text>
+    </TouchableOpacity>
+  </View>
+</View>
+
+```
+
+## Make your own builder with `makeCustomBuilder`
+> You can make an custom builder for your app style
 ```ts
-s('w-56-a w-64-i');
-// => Will be { width: 56 } on android and { width: 64 } on ios
-
-s('w-10% w-20%-sm');
-// => Will be default { width: 10% } and { width: 20% } on small screen
+const {useStyleBuilder} = makeCustomBuilder({
+  light: {
+    COLORS: {BLUE: '#445599', PINK: '#ff4499'},
+    SOLID: {
+      l1: 4,
+      l2: 8,
+      l3: 12,
+      l4: 18,
+      l5: 32,
+      l6: 48,
+      l7: 64,
+    },
+  },
+  dark: {
+    COLORS: {BLUE: '#445599', PINK: '#ff4499'},
+    SOLID: {
+      l1: 4,
+      l2: 8,
+      l3: 12,
+      l4: 18,
+      l5: 32,
+      l6: 48,
+      l7: 64,
+    },
+  },
+  // w-100%-lol => only in IOS and Darkmode is turned on
+  breakpoints: {lol: (isDark: boolean) => isDark && Platform.OS === 'ios'},
+  builder: style => ({
+    wow: {
+      fontSize: 24 * style.SOLID.l1,
+      fontWeight: "600",
+      color: style.COLORS.PINK,
+    },
+    wow2: {
+      fontSize: 24 * style.SOLID.l2,
+      fontWeight: "600",
+      color: style.COLORS.PINK,
+    },
+    // wow3-value1-value2...
+    wow3: (value1: number, value2: string) =>({
+      fontSize: 24 * value1,
+      fontWeight: "600",
+      color: value2,
+    })
+  }),
+});
+// IMPORT YOUR useStyleBuilder into COMPONENT
+const {s} = useStyleBuilder();
+// Try it
+s`wow-lol wow3-3-#123321`
 ```
 
 ### Default config
 
-> Your change override or add breakpoint by use `useOverrideBuilder` and pick `overrideStyle`
+> Default value if use `useStyleBuilder` directly from library
 
 ```ts
-const LIGHT_STYLE: IAppStyles = {
-  COLORS: {
-    PRIME: '#389bff',
-    PURPLE: '#9b71de',
-    BLUE: 'blue',
-    RED: '#de2f2f',
-    ORANGE: 'orange',
-    GREEN: 'green',
-    WHITE: 'white',
-    FONT_LIGHT: '#717171',
-    FONT_HARD: '#2b2b2b',
-    BACKGROUND_LIGHT: '#f6f6f6',
-    BACKGROUND_MED: 'white',
-    BACKGROUND_HARD: 'white',
-    BLACK: '#000',
-    GRAY: '#b6c0cc',
-  },
-  FONT: {
-    SIZE: {
-      f7: reScale(8),
-      f6: reScale(10),
-      f5: reScale(12),
-      f4: reScale(14),
-      f3: reScale(18),
-      f2: reScale(22),
-      f1: reScale(26),
-    },
-    WEIGHT: { thin: '200', bold: 'bold', default: 'normal' },
-  },
-  BORDER: {
-    RADIUS: {
-      default: reScale(10),
-      pill: reScale(42),
-      ...DEFAULT_VAL,
-    },
-  },
-};
-
-const DARK_STYLE: IAppStyles = {
-  ...LIGHT_STYLE,
-  COLORS: {
-    ...LIGHT_STYLE.COLORS,
-    RED: '#ff0266',
-    FONT_LIGHT: '#5D5D5D',
-    FONT_HARD: '#D7D7D7',
-    BACKGROUND_LIGHT: '#585858',
-    BACKGROUND_MED: '#464646',
-    BACKGROUND_HARD: '#333333',
-  },
-  FONT: {
-    ...LIGHT_STYLE.FONT,
-    WEIGHT: { thin: '300', bold: 'bold', default: 'normal' },
-  },
-};
+EARLY_DEVICE_RATIO_POINT: 1.8,
+THEME_MODE: 'light',
+THEME_AUTO: true,
+SCALE_BASE: 0.95,
+SOLID_SIZE: {
+  l1: 4,
+  l2: 8,
+  l3: 12,
+  l4: 18,
+  l5: 32,
+  l6: 48,
+  l7: 64,
+},
+FONT_SIZE: {
+  f1: 26,
+  f2: 22,
+  f3: 18,
+  f4: 14,
+  f5: 12,
+  f6: 10,
+  f7: 8,
+},
+COLORS_LIGHT: {
+  PRIME: '#389bff',
+  PURPLE: '#9b71de',
+  BLUE: 'blue',
+  RED: '#de2f2f',
+  ORANGE: 'orange',
+  GREEN: 'green',
+  WHITE: 'white',
+  FONT_LIGHT: '#717171',
+  FONT_HARD: '#2b2b2b',
+  BACKGROUND_LIGHT: '#f6f6f6',
+  BACKGROUND_MED: 'white',
+  BACKGROUND_HARD: 'white',
+  BLACK: '#000',
+  GRAY: '#b6c0cc',
+},
+COLORS_DARK: {
+  PRIME: '#389bff',
+  PURPLE: '#9b71de',
+  BLUE: 'blue',
+  RED: '#ff0266',
+  ORANGE: 'orange',
+  GREEN: 'green',
+  WHITE: 'white',
+  FONT_LIGHT: '#5D5D5D',
+  FONT_HARD: '#D7D7D7',
+  BACKGROUND_LIGHT: '#585858',
+  BACKGROUND_MED: '#464646',
+  BACKGROUND_HARD: '#333333',
+  BLACK: '#000',
+  GRAY: '#b6c0cc',
+},
+LIGHT_FONT_WEIGHT: { thin: '200', bold: 'bold', default: 'normal' },
+DARK_FONT_WEIGHT: { thin: '300', bold: 'bold', default: 'normal' },
 ```
 
 ### Support command
-
-> You can override using `useOverrideBuilder` hook and use `overrideRules`
+> Read more at style folder
 
 | Command                  | About                                                                          | Note                                                                            |
 | :----------------------- | :----------------------------------------------------------------------------- | :------------------------------------------------------------------------------ |
 | <b>View Size             |                                                                                |                                                                                 |
 | vw-{size}                | Width base on screen's width                                                   | value as percent                                                                |
+| vw{percent}              | Width base on screen's width                                                   | value as percent, 10 each step                                                  |
 | vh-{size}                | Height base on screen's height                                                 | value as percent                                                                |
+| vh{percent}              | Height base on screen's height                                                 | value as percent, 10 each step                                                  |
+| vh{solidLevel}           | Height = Width = min screen's dimentions (Square view)                         | Solid level, from 1 - 7                                                         |
 | wh-{size}                | Height = Width = min screen's dimentions (Square view)                         | value as percent                                                                |
+| wh{solidLevel}           | Height = Width = min screen's dimentions (Square view)                         | Solid level, from 1 - 7                                                         |
 | h-{size}                 | height of view, base on parent size for percent or pixel                       | can be h-100% for 100% or h-100 for 100px                                       |
+| h{solidLevel}            | height of view, base on parent size for percent or pixel                       | Solid level, from 1 - 7                                                         |
 | w-{size}                 | width of view, base on parent size for percent or pixel                        | can be w-100% for 100% or w-100 for 100px                                       |
+| w{solidLevel}            | width of view, base on parent size for percent or pixel                        | Solid level, from 1 - 7                                                         |
 | mh-{size}                | maxHeight of view, base on parent size for percent or pixel                    | can be mh-100% for 100% or mh-100 for 100px                                     |
+| mh{solidLevel}           | maxHeight of view, base on parent size for percent or pixel                    | Solid level, from 1 - 7                                                         |
 | mw-{size}                | maxWidth of view, base on parent size for percent or pixel                     | can be mw-100% for 100% or mw-100 for 100px                                     |
+| mw{solidLevel}           | maxWidth of view, base on parent size for percent or pixel                     | Solid level, from 1 - 7                                                         |
 | mvh-{size}               | maxHeight of view, base on phone's height                                      | value as percent                                                                |
 | mvw-{size}               | maxWidth of view, base on phone's width                                        | value as percent                                                                |
 | flex-{size}              | define flex size of view                                                       | value as number, default is 1                                                   |
@@ -173,11 +226,8 @@ const DARK_STYLE: IAppStyles = {
 | tc                       | textAlign: center                                                              |                                                                                 |
 | tl                       | textAlign: left                                                                |                                                                                 |
 | tr                       | textAlign: right                                                               |                                                                                 |
-| f1                       | fontSize: \${xlSize}                                                           |                                                                                 |
-| f2                       | fontSize: \${lSize}                                                            |                                                                                 |
-| f3                       | fontSize: \${mSize}                                                            |                                                                                 |
-| f4                       | fontSize: \${sSize}                                                            |                                                                                 |
-| f5                       | fontSize: \${xsSize}                                                           |                                                                                 |
+| f{fontLevel}             | fontSize: \${fontLevel}                                                        | With font level from 1-7                                                        |
+| fw-{weightLevel}         | fontWeight: \${weightLevel}                                                        | This is font weight level                                                       |
 | bold                     | fontWeight: \${boldSize}                                                       |                                                                                 |
 | thin                     | fontWeight: \${thinSize}                                                       |                                                                                 |
 | <b>Object position       |                                                                                |
@@ -188,6 +238,9 @@ const DARK_STYLE: IAppStyles = {
 | left-{pos}               | set left position                                                              | can be left-10 for 10px or left-10% for 10% from left                           |
 | right-{pos}              | set right position                                                             | can be right-10 for 10px or right-10% for 10% from right                        |
 | z-{index}                | set zIndex of view                                                             | value as number > 0 only                                                        |
+| z100                | set 100 zIndex of view                                                            | |
+| z999                | set 999 zIndex of view                                                             |                                                       |
+| z9999                | set 9999 zIndex of view                                                             ||
 | pa-{size}                | padding view by size                                                           | size can be `10%` for percent or `10` for pixel                                 |
 | pt-{size}                | paddingTop view by size                                                        | size can be `10%` for percent or `10` for pixel                                 |
 | pb-{size}                | paddingBottom view by size                                                     | size can be `10%` for percent or `10` for pixel                                 |
@@ -198,23 +251,30 @@ const DARK_STYLE: IAppStyles = {
 | mb-{size}                | marginBottom view by size                                                      | size can be `10%` for percent or `10` for pixel                                 |
 | ml-{size}                | marginLeft view by size                                                        | size can be `10%` for percent or `10` for pixel                                 |
 | mr-{size}                | marginRight view by size                                                       | size can be `10%` for percent or `10` for pixel                                 |
+| > All object position have solid size by {prefix}{solidLevel} with solid level from 1 - 7
 | <b>Border properties     |                                                                                |
 | ba                       | borderStyle solid                                                              |                                                                                 |
-| bdot                     | borderStyle dotted                                                             |                                                                                 |
-| bdash                    | borderStyle dashed                                                             |                                                                                 |
+| bat-{width}                   | borderStyle solid, borderTopWidth                                          |                                                                            |
+| bab-{width}                   | borderStyle solid, borderBottomWidth                                              |                                                                            |
+| bar-{width}                   | borderStyle solid, borderRightWidth                                              |                                                                            |
+| bal-{width}                   | borderStyle solid, borderLeftWidth                                              |                                                                            |
+| b--dot                     | borderStyle dotted                                                             |                                                                                 |
+| b--dash                    | borderStyle dashed                                                             |                                                                                 |
 | bw-{size}                | borderWidth size                                                               | size can be `10%` for percent or `10` for pixel                                 |
-| br-{size}                | borderRadius size, default as \${Input Radius}                                 | size can be `10%` for percent or `10` for pixel                                 | percent or `10` for pixel |
-| brPill                 | borderRadius \${pill radius}                                                   |                                                                                 |
-| brBottom               | borderRadius only bottom                                                       |                                                                                 |
-| brTop                  | borderRadius only top                                                          |                                                                                 |
-| brLeft                 | borderRadius only left                                                         |                                                                                 |
-| brRight                | borderRadius only right                                                        |                                                                                 |
+| br{solidSize}            | borderRadius with solid size                                                   | solid size from 1 - 7 level                                 | 
+| br-pill                 | borderRadius \${pill radius}                                                   |                                                                                 |
+| br--bottom               | borderRadius only bottom                                                       |                                                                                 |
+| br--top                  | borderRadius only top                                                          |                                                                                 |
+| br--left                 | borderRadius only left                                                         |                                                                                 |
+| br--right                | borderRadius only right                                                        |                                                                                 |
 | <b>Utils properties      |                                                                                |
-| centerItems              | center all items in view                                                       |                                                                                 |
-| justifyCenter            | justifyContent center                                                          |                                                                                 |
-| itemsCenter              | alignItems center                                                              |                                                                                 |
-| flexRow                      | flexDirection: row                                                             |                                                                                 |
-| flexColumn                   | flexDirection: column                                                          |                                                                                 |
+| center-items              | center all items in view                                                       |                                                                                 |
+| justify-{center,start,end}            | justifyContent                                                          |                                                                                 |
+| items-{center,start,end}              | alignItems                                                              |                                                                                 |
+| flex-row                      | flexDirection: row                                                             |                                                                                 |
+| flex-column                   | flexDirection: column                                                          |                                                                                 |
+| flex-{wrap,nowrap}       | flexWrap                                              |                                                                                 |
+| overflow-{visible,hidden,scroll} | overflow                                                      |                                                                                 |
 | shadow-${depth}-${color} | Drop shadow to view                                                            | depth as number default 3, color default #000, depth and color only work on ios |
 | <b>Color properties      |                                                                                |
 | o-{alpha}                | opacity: alpha size                                                            | alpha size from 0-100 as percent                                                |
@@ -228,6 +288,7 @@ const DARK_STYLE: IAppStyles = {
 | black                    | color: \${black}                                                               |
 | light                    | color: \${fontLight}                                                           |
 | hard                     | color: \${fontHard}                                                            |
-| bg-{color}               | backgroundColor: color, support all above color, default as \${backgroundHard} | `light` and `hard` color with changed to `flight` and `fhard`                   |
+| {color}-{alphaPercent}   | color: \${color} with alpha percent                                         | `alphaPercent` Should in range (0-100)|
+| bg-{color}-{alphaPercent}               | backgroundColor: color, support all above color, default as \${backgroundHard} | `light` and `hard` color with changed to `flight` and `fhard`                   |
 | bg-med                   | color: \${backgroundMedium}                                                    |
 | bg-light                 | color: \${backgroundLight}                                                     |
