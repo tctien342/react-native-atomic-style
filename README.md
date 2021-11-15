@@ -6,9 +6,9 @@
 ## Install
 ```bash
 # Install using yarn
-yarn add @tctien342/react-native-atomic-style
+yarn add @saintno/react-native-atomic-style
 # Or prefer npm way
-npm install @tctien342/react-native-atomic-style
+npm install @saintno/react-native-atomic-style
 ```
 
 ## Usage
@@ -56,7 +56,7 @@ s`bg-white-i bg-purple-a pa3 br-pill br1-a pl4 pr4 shadow-3`
 
 ## Example
 ```tsx
-import {useStyleBuilder} from '@tctien342/react-native-atomic-style';
+import {useStyleBuilder} from '@saintno/react-native-atomic-style';
 /**COMPONENT**/
 const {s} = useStyleBuilder();
 

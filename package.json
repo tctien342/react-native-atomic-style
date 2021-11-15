@@ -1,7 +1,7 @@
 {
-  "name": "@tctien342/react-native-atomic-style",
-  "version": "2.0.1-rev4",
-  "description": "ReactUI library by @SaintNo",
+  "name": "@saintno/react-native-atomic-style",
+  "version": "2.0.1-rev5",
+  "description": "React native atomic style library by @SaintNo",
   "main": "build/index.js",
   "module": "build/index.es.js",
   "jsnext:main": "build/index.es.js",
@@ -19,10 +19,10 @@
     "url": "git+https://github.com/tctien342/react-native-atomic-style.git"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://registry.npmjs.org"
   },
   "author": "tctien342",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/tctien342/react-native-atomic-style/issues"
   },
@@ -83,5 +83,15 @@
     "classnames": "^2.3.1",
     "lodash": "^4.17.21",
     "react-hooks-global-state": "^1.0.2"
-  }
+  },
+  "keywords": [
+    "react",
+    "css",
+    "styles",
+    "atomic",
+    "inline",
+    "styles",
+    "native",
+    "tachyons"
+  ]
 }
