@@ -1,6 +1,6 @@
 import { SCREEN_HEIGHT, SCREEN_TYPE, SCREEN_WIDTH } from '@constants/size';
 import { getGlobalState } from '@constants/state';
-import { PixelRatio, Platform } from 'react-native';
+import { PixelRatio } from 'react-native';
 
 const WIDTH_PERCENT = SCREEN_WIDTH / 100;
 const HEIGHT_PERCENT = SCREEN_HEIGHT / 100;
@@ -21,11 +21,7 @@ const reScale = (size: number, overrideScale?: number): number => {
       newSize *= 0.9;
       break;
   }
-  if (Platform.OS === 'ios') {
-    return Math.round(PixelRatio.roundToNearestPixel(newSize));
-  } else {
-    return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 2;
-  }
+  return Math.round(PixelRatio.roundToNearestPixel(newSize));
 };
 
 /**
