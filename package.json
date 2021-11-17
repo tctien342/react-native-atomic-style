@@ -1,6 +1,6 @@
 {
   "name": "@saintno/react-native-atomic-style",
-  "version": "2.0.2",
+  "version": "2.0.3-rc2",
   "description": "React native atomic style library by @SaintNo",
   "main": "build/index.js",
   "module": "build/index.es.js",

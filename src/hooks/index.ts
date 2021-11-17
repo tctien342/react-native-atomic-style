@@ -2,9 +2,10 @@ import { useGlobalState } from '@constants/state';
 import { DARK_STYLE, LIGHT_STYLE } from '@constants/style';
 import { RecursivePartial } from '@declares/app';
 import { IAppStyles } from '@declares/style';
-import { BREAK_POINT, BUILDER_PACK, creator, styleBuilders } from '@styles/index';
+import { BREAK_POINT, BUILDER_PACK, clearCacheBuilder, creator, styleBuilders } from '@styles/index';
 import { cloneDeep, merge } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
+import { createGlobalState } from 'react-hooks-global-state';
 import { StyleProp } from 'react-native';
 
 export type TUseStyleBuilder = {
@@ -114,17 +115,48 @@ const makeCustomBuilder = <T = {}, S = {}, B = {}>(config: {
    */
   builder?: (style: IAppStyles & T, isDark: boolean) => S;
 }) => {
-  const lightStyle = merge(LIGHT_STYLE, config.light) as any;
-  const darkStyle = merge(DARK_STYLE, config.dark) as any;
+  const lightStyle = merge(LIGHT_STYLE, config.light);
+  const darkStyle = merge(DARK_STYLE, config.dark);
   const compiledStyle = {
     LIGHT: merge(styleBuilders(lightStyle, false), config.builder?.(lightStyle, false)),
     DARK: merge(styleBuilders(darkStyle, true), config.builder?.(darkStyle, true)),
     BREAK_POINT: merge(BREAK_POINT, config.breakpoints),
   };
+
+  const { useGlobalState: useCustomGlobal } = createGlobalState({
+    STYLE: { LIGHT: lightStyle, DARK: darkStyle },
+    COMPILED: compiledStyle,
+  });
+
+  const useAppStyle = () => {
+    const [globalStyle, setGlobalStyle] = useCustomGlobal('STYLE');
+    const [, setCompiledStyle] = useCustomGlobal('COMPILED');
+
+    const setStyle = (style: {
+      light?: RecursivePartial<IAppStyles> & RecursivePartial<T>;
+      dark?: RecursivePartial<IAppStyles> & RecursivePartial<T>;
+    }) => {
+      clearCacheBuilder();
+      const lightStyle = merge(LIGHT_STYLE, style.light);
+      const darkStyle = merge(DARK_STYLE, style.dark);
+      setGlobalStyle((prev) => ({
+        LIGHT: merge(prev.LIGHT, lightStyle),
+        DARK: merge(prev.DARK, darkStyle),
+      }));
+      setCompiledStyle((prev) => ({
+        ...prev,
+        LIGHT: merge(prev.LIGHT, styleBuilders(lightStyle, false)),
+        DARK: merge(prev.DARK, styleBuilders(darkStyle, true)),
+      }));
+    };
+    return [globalStyle, setStyle] as [typeof globalStyle, typeof setStyle];
+  };
+
   const useStyleBuilder = (): TUseStyleBuilder => {
     const { isDarkMode, setDarkMode } = useDarkMode();
+    const [currentCompiled] = useCustomGlobal('COMPILED');
     const currentStyle: IAppStyles & T = isDarkMode ? darkStyle : lightStyle;
-    const currentCompiler = compiledStyle[isDarkMode ? 'LIGHT' : 'DARK'] as ReturnType<typeof styleBuilders> & S;
+    const currentCompiler = currentCompiled[isDarkMode ? 'LIGHT' : 'DARK'] as ReturnType<typeof styleBuilders> & S;
     /**
      * Style builder with callback cache
      */
@@ -138,14 +170,14 @@ const makeCustomBuilder = <T = {}, S = {}, B = {}>(config: {
           });
           return merge(cloneDeep(merge(creator(isDarkMode)(query), extra)), extra) as StyleProp<C>;
         }
-        return creator(isDarkMode, compiledStyle)(query) as StyleProp<C>;
+        return creator(isDarkMode, currentCompiled)(query) as StyleProp<C>;
       },
-      [isDarkMode],
+      [isDarkMode, currentCompiled],
     );
 
     return { s: builder, f: currentCompiler, style: currentStyle, isDarkMode, setDarkMode };
   };
-  return { useStyleBuilder };
+  return { useStyleBuilder, useAppStyle };
 };
 
 export { makeCustomBuilder, useDarkMode, useDynamicStyle, useStyleBuilder };

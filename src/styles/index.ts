@@ -41,12 +41,19 @@ export const BUILDER_PACK = { LIGHT: LIGHT_BUILDER, DARK: DARK_BUILDER, BREAK_PO
 /**
  * Cached builded styles for not build it each time call again with same build string
  */
-const cacheBuilder: {
+let cacheBuilder: {
   [key: string]: {
     dark?: { [key: string]: string | number };
     light?: { [key: string]: string | number };
   };
 } = {};
+
+/**
+ * Will be called when update new style
+ */
+export const clearCacheBuilder = (): void => {
+  cacheBuilder = {};
+};
 
 const getStyle = (dark: boolean, token: string, builderPack = BUILDER_PACK): { [key: string]: string | number } => {
   let output = {};
@@ -98,7 +105,7 @@ const getStyle = (dark: boolean, token: string, builderPack = BUILDER_PACK): { [
   return output;
 };
 
-export const creator = (isDarkMode = false, builderPack = BUILDER_PACK) => {
+export const creator = (isDarkMode = false, builderPack: Readonly<typeof BUILDER_PACK> = BUILDER_PACK) => {
   const dark = isDarkMode ? 'dark' : 'light';
   /**
    * Convert tachyons syntax string to react native style
